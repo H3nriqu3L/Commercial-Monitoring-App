@@ -13,7 +13,8 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="16dp"
+        android:background="#cce3e4">
 
         <ImageView
             android:id="@+id/header_image"
@@ -21,14 +22,15 @@
             android:layout_height="match_parent"
             android:src="@drawable/cropped_logo_rubeus"
             android:scaleType="centerInside"
-            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
             android:contentDescription="Ícone do Cabeçalho" />
 
         <ImageView
             android:id="@+id/menu_icon"
             android:layout_width="40dp"
             android:layout_height="match_parent"
-            android:layout_alignParentEnd="true"
+
+            android:layout_alignParentStart="true"
             android:src="@drawable/baseline_dehaze_24"
             android:scaleType="centerInside"
             android:padding="8dp"
@@ -43,6 +45,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/home"
+            android:clickable="true"
+            android:focusable="true"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#000000"
