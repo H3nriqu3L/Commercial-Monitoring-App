@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/cropped_logo_rubeus"
+            android:contentDescription="Logo da Rubeus"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bem-vindo de volta"
+            android:textColor="#000000"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="32dp"/>
+
+        <EditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="E-mail"
+            android:inputType="textEmailAddress"
+            android:backgroundTint="#FFFFFF"
+            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#D3D3D3" />
+
+        <EditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Senha"
+            android:inputType="textPassword"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#D3D3D3" />
+
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Entrar"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="#1E88E5"
+            android:textColor="#FFFFFF"
+            android:padding="12dp"
+            android:background="@drawable/btn_rounded"/>
+
+    </LinearLayout>
+</ScrollView>
