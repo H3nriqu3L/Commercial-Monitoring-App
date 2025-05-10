@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">Commercial-Monitoring-App</string>
     <string name="home">Home</string>
+    <string name="menuitem1">Meu Perfil</string>
+    <string name="menuitem2">Dashboard</string>
+    <string name="menuitem4">Configurações</string>
+    <string name="menuitem3">Interações</string>
+    <string name="menuitem5">Logout</string>
 </resources>
