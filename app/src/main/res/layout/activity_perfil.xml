@@ -32,7 +32,6 @@
                 android:padding="8dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:tint="@android:color/black"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Retornar"
                 android:onClick="navigateBack" />
