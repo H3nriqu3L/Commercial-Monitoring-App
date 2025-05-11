@@ -12,6 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CommercialMonitoringApp"
         tools:targetApi="31">
+        <activity android:name=".LeadsActivity"
+            android:exported="false" />
         <activity
             android:name=".LoginActivity"
             android:exported="false" />
