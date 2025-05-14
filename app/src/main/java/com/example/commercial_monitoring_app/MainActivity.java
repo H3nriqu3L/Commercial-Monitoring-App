@@ -1,5 +1,6 @@
 package com.example.commercial_monitoring_app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AppCompatActivity;
@@ -36,10 +37,6 @@ import android.widget.Toast;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.util.DisplayMetrics;
-
-
-
-
 
 public class MainActivity extends AppCompatActivity {
     private TextView txtSelectedMonth;
@@ -150,8 +147,9 @@ public class MainActivity extends AppCompatActivity {
         // Exemplo de clique
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
         item1.setOnClickListener(v -> {
-            Toast.makeText(this, "Item 1 clicado", Toast.LENGTH_SHORT).show();
             popupWindow.dismiss();
+            Intent it = new Intent(this, PerfilActivity.class);
+            startActivity(it);
         });
 
         LinearLayout item2 = popupView.findViewById(R.id.menu_item2);
@@ -178,8 +176,4 @@ public class MainActivity extends AppCompatActivity {
             popupWindow.dismiss();
         });
     }
-
-
-
-
 }
