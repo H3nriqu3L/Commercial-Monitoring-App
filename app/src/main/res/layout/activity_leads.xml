@@ -7,17 +7,28 @@
     android:layout_height="match_parent"
     tools:context=".LeadsActivity">
 
-    <!-- Cabeçalho -->
     <RelativeLayout
         android:id="@+id/header_layout"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="80dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:background="#cce3e4"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/menu_icon"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/arrow_back"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Retornar"
+            android:onClick="navigateBack" />
 
         <ImageView
             android:id="@+id/header_image"
@@ -25,20 +36,8 @@
             android:layout_height="match_parent"
             android:src="@drawable/cropped_logo_rubeus"
             android:scaleType="centerInside"
-            android:layout_alignParentStart="true"
-            android:contentDescription="Ícone do Cabeçalho" />
+            android:layout_alignParentEnd="true" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/menuitem3"
-            android:clickable="true"
-            android:focusable="true"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_centerInParent="true" />
     </RelativeLayout>
 
     <TextView

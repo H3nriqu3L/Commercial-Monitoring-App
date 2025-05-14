@@ -64,6 +64,10 @@ public class LeadsActivity extends AppCompatActivity {
         });
     }
 
+    public void navigateBack(View view) {
+        finish();
+    }
+
     private void setupGraficosCaptacao() {
         String[] etapas = {"Interessado", "Inscrito", "Visita", "Matrícula"};
         int[] valores = {4, 25, 20, 25};
