@@ -130,21 +130,27 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
+        int screenHeight = displayMetrics.heightPixels;
 
-        int width = (int) (screenWidth * 0.75); // 75% da largura da tela
+        int width = (int) (screenWidth * 0.65); // x% of screen width
         int height = ViewGroup.LayoutParams.MATCH_PARENT;
         boolean focusable = true;
 
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-        popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        //popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
+        popupWindow.setAnimationStyle(R.style.PopupAnimation);
 
-        popupWindow.showAtLocation(view, Gravity.START, 0, 0); // como um drawer da esquerda
+        View headerView = findViewById(R.id.header_include);
 
-        // Botão de fechar
-        ImageView closeButton = popupView.findViewById(R.id.close_button);
-        closeButton.setOnClickListener(v -> popupWindow.dismiss());
+        popupWindow.showAsDropDown(headerView, 0, 0, Gravity.END);
 
-        // Exemplo de clique
+
+
+        // Close button
+//        ImageView closeButton = popupView.findViewById(R.id.close_button);
+//        closeButton.setOnClickListener(v -> popupWindow.dismiss());
+
+        // Click examples
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
         item1.setOnClickListener(v -> {
             popupWindow.dismiss();
@@ -160,13 +166,10 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout item3 = popupView.findViewById(R.id.menu_item3);
         item3.setOnClickListener(v -> {
-            Toast.makeText(this, "Item 3 clicado", Toast.LENGTH_SHORT).show();
             popupWindow.dismiss();
 
             Intent leads_intent = new Intent(this, LeadsActivity.class);
-
             startActivity(leads_intent);
-
         });
 
         LinearLayout item4 = popupView.findViewById(R.id.menu_item4);
