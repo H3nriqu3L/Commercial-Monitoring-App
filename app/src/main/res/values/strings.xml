@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Commercial-Monitoring-App</string>
+    <string name="app_name">Rubeus CRM</string>
     <string name="home">Home</string>
     <string-array name="time_filter_options">
         <item>Última semana</item>
