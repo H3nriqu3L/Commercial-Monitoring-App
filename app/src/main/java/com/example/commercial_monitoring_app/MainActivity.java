@@ -6,6 +6,9 @@ import android.widget.ArrayAdapter;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View.OnTouchListener;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -144,11 +147,48 @@ public class MainActivity extends AppCompatActivity {
 
         popupWindow.showAsDropDown(headerView, 0, 0, Gravity.START);
 
+        View rootView = popupView.findViewById(R.id.popup_container);
+
+        // Track touch movement for manual swipe detection
+        final float[] startX = new float[1];
+        final float[] startY = new float[1];
+
+        rootView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Record initial touch position
+                        startX[0] = event.getX();
+                        startY[0] = event.getY();
+                        return true;
+
+                    case MotionEvent.ACTION_MOVE:
+                        // Calculate distance moved
+                        float currentX = event.getX();
+                        float currentY = event.getY();
+                        float deltaX = currentX - startX[0];
+                        float deltaY = currentY - startY[0];
+
+                        // If horizontal movement is greater than vertical and is leftward
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < -50) {
+                            // User is swiping left, dismiss the popup
+                            popupWindow.dismiss();
+                            return true;
+                        }
+                        return true;
+
+                    case MotionEvent.ACTION_UP:
+                        // Reset values
+                        startX[0] = 0;
+                        startY[0] = 0;
+                        return true;
+                }
+                return false;
+            }
+        });
 
 
-        // Close button
-//        ImageView closeButton = popupView.findViewById(R.id.close_button);
-//        closeButton.setOnClickListener(v -> popupWindow.dismiss());
 
         // Click examples
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
