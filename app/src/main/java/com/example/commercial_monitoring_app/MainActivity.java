@@ -162,6 +162,11 @@ public class MainActivity extends AppCompatActivity {
         item3.setOnClickListener(v -> {
             Toast.makeText(this, "Item 3 clicado", Toast.LENGTH_SHORT).show();
             popupWindow.dismiss();
+
+            Intent leads_intent = new Intent(this, LeadsActivity.class);
+
+            startActivity(leads_intent);
+
         });
 
         LinearLayout item4 = popupView.findViewById(R.id.menu_item4);
