@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
-        int screenHeight = displayMetrics.heightPixels;
+
 
         int width = (int) (screenWidth * 0.65); // x% of screen width
         int height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         View headerView = findViewById(R.id.header_include);
 
-        popupWindow.showAsDropDown(headerView, 0, 0, Gravity.END);
+        popupWindow.showAsDropDown(headerView, 0, 0, Gravity.START);
 
 
 
