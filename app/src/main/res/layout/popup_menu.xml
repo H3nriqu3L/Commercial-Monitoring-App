@@ -100,7 +100,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/dashboard"
+            android:src="@drawable/binoculars"
             app:tint="#000000"/>
 
         <TextView

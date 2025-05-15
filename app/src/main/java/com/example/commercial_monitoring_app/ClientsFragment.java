@@ -46,6 +46,7 @@ public class ClientsFragment extends Fragment {
         clientsList.add(new Client("Client 1", "Description for client 1"));
         clientsList.add(new Client("Client 2", "Description for client 2"));
         clientsList.add(new Client("Client 3", "Description for client 3"));
+
         // Add as many clients as you need
 
         clientsAdapter = new ClientsAdapter(clientsList);

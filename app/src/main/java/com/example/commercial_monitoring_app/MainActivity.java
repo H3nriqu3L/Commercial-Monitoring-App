@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import android.view.MotionEvent;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import android.util.DisplayMetrics;
 
 public class MainActivity extends AppCompatActivity {
     private TextView headerTitle;
+    private FloatingActionButton mainFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
         headerTitle = findViewById(R.id.header);
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        mainFab = findViewById(R.id.main_fab);
 
         // Home default
         replaceFragment(new HomeFragment());
@@ -40,21 +43,30 @@ public class MainActivity extends AppCompatActivity {
             if (id == R.id.page_home) {
                 replaceFragment(new HomeFragment());
                 headerTitle.setText(R.string.home);
+                mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_clients) {
                 replaceFragment(new ClientsFragment());
                 headerTitle.setText(R.string.oportunidades);
+                mainFab.setVisibility(View.VISIBLE);
                 return true;
             } else if (id == R.id.page_insights) {
                 replaceFragment(new LeadsFragment());
                 headerTitle.setText(R.string.insights);
+                mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_profile) {
                 replaceFragment(new PerfilFragment());
                 headerTitle.setText(R.string.perfil);
+                mainFab.setVisibility(View.GONE);
                 return true;
             }
             return false;
+        });
+
+        // FAB click listener
+        mainFab.setOnClickListener(v -> {
+            // Handle your FAB click action here
         });
 
 
@@ -136,8 +148,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
         item1.setOnClickListener(v -> {
             popupWindow.dismiss();
-            replaceFragment(new PerfilFragment());
-            headerTitle.setText(R.string.perfil);
+
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_profile);
         });
@@ -145,15 +156,17 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout item2 = popupView.findViewById(R.id.menu_item2);
         item2.setOnClickListener(v -> {
-            Toast.makeText(this, "Item 2 clicado", Toast.LENGTH_SHORT).show();
             popupWindow.dismiss();
+
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            bottomNavigation.setSelectedItemId(R.id.page_clients);
+
         });
 
         LinearLayout item3 = popupView.findViewById(R.id.menu_item3);
         item3.setOnClickListener(v -> {
             popupWindow.dismiss();
-            replaceFragment(new LeadsFragment());
-            headerTitle.setText(R.string.insights);
+
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_insights);
         });
