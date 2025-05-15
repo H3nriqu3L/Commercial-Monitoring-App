@@ -1,43 +1,56 @@
 package com.example.commercial_monitoring_app;
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-public class LeadsActivity extends AppCompatActivity {
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-    BarChart barChart;
-    LineChart lineChart;
-    Spinner spinnerProcessos;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+public class LeadsFragment extends Fragment {
+
+    private BarChart barChart;
+    private LineChart lineChart;
+    private Spinner spinnerProcessos;
+
+    public LeadsFragment() {
+        // Construtor vazio obrigatório
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_leads);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
 
-        barChart = findViewById(R.id.barChart);
-        lineChart = findViewById(R.id.lineChart);
-        spinnerProcessos = findViewById(R.id.spinner_processos);
+        View view = inflater.inflate(R.layout.fragment_leads, container, false);
+
+        barChart = view.findViewById(R.id.barChart);
+        lineChart = view.findViewById(R.id.lineChart);
+        spinnerProcessos = view.findViewById(R.id.spinner_processos);
 
         setupSpinner();
+
+        return view;
     }
 
     private void setupSpinner() {
@@ -45,7 +58,7 @@ public class LeadsActivity extends AppCompatActivity {
         processos.add("Captação Graduação");
         processos.add("Acompanhamento do Estudante");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, processos);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, processos);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerProcessos.setAdapter(adapter);
 
@@ -62,10 +75,6 @@ public class LeadsActivity extends AppCompatActivity {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-    }
-
-    public void navigateBack(View view) {
-        finish();
     }
 
     private void setupGraficosCaptacao() {
@@ -92,7 +101,7 @@ public class LeadsActivity extends AppCompatActivity {
         }
 
         BarDataSet barDataSet = new BarDataSet(barEntries, "Oportunidades");
-        barDataSet.setColors(new int[]{R.color.teal_200, R.color.teal_700, R.color.purple_200, R.color.purple_500}, this);
+        barDataSet.setColors(new int[]{R.color.teal_200, R.color.teal_700, R.color.purple_200, R.color.purple_500}, requireContext());
         barDataSet.setValueTextSize(14f);
         BarData barData = new BarData(barDataSet);
         barChart.setData(barData);
@@ -101,7 +110,7 @@ public class LeadsActivity extends AppCompatActivity {
         barChart.invalidate();
 
         LineDataSet lineDataSet = new LineDataSet(lineEntries, "Tempo Médio (dias)");
-        lineDataSet.setColor(getColor(R.color.purple_500));
+        lineDataSet.setColor(requireContext().getColor(R.color.purple_500));
         lineDataSet.setLineWidth(2f);
         lineDataSet.setCircleRadius(5f);
         lineDataSet.setValueTextSize(12f);
@@ -112,4 +121,3 @@ public class LeadsActivity extends AppCompatActivity {
         lineChart.invalidate();
     }
 }
-

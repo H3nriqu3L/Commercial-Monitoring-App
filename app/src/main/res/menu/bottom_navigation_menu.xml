@@ -6,7 +6,7 @@
         android:icon="@drawable/home"
         android:title="Home"/>
     <item
-        android:id="@+id/page_clientes"
+        android:id="@+id/page_clients"
         android:enabled="true"
         android:icon="@drawable/binoculars"
         android:title="Oportunidades"/>

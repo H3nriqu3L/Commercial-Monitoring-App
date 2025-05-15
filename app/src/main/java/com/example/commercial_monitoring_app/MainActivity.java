@@ -2,158 +2,63 @@ package com.example.commercial_monitoring_app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.GestureDetector;
+import androidx.fragment.app.Fragment;
+
 import android.view.MotionEvent;
-import android.view.View.OnTouchListener;
-
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.data.PieData;
-import com.github.mikephil.charting.data.PieDataSet;
-import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.app.DatePickerDialog;
-import android.widget.DatePicker;
-import java.util.Calendar;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.view.Gravity;
-import android.widget.ImageView;
 import android.util.DisplayMetrics;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView txtSelectedMonth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //----------------FOOTER SETUP----------------//
-
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.page_home || itemId == R.id.page_clientes) {
-                // We're already in MainActivity, so we don't need to do anything for these tabs
-                return true;
-            }
-            else if (itemId == R.id.page_insights) {
-                // Launch the LeadsActivity
-                startActivity(new Intent(this, LeadsActivity.class));
-                return true;
-            }
-            else if (itemId == R.id.page_profile) {
-                // Launch the PerfilActivity
-                startActivity(new Intent(this, PerfilActivity.class));
-                return true;
-            }
 
+        // Home default
+        replaceFragment(new HomeFragment());
+
+
+        bottomNavigation.setOnItemSelectedListener(item ->{
+            int id = item.getItemId();
+
+            if (id == R.id.page_home) {
+                replaceFragment(new HomeFragment());
+                return true;
+            } else if (id == R.id.page_clients) {
+                replaceFragment(new HomeFragment());
+                return true;
+            } else if (id == R.id.page_insights) {
+                replaceFragment(new LeadsFragment());
+                return true;
+            } else if (id == R.id.page_profile) {
+                replaceFragment(new PerfilFragment());
+                return true;
+            }
             return false;
         });
 
 
-        //---------------- END  FOOTER SETUP----------------//
+    }
 
-
-
-        // Gráfico de barras - Vendas Gerais
-        BarChart generalBarChart = findViewById(R.id.generalBarChart);
-
-        ArrayList<BarEntry> entriesGeneral = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            entriesGeneral.add(new BarEntry(i, (i + 1) * 10));
-        }
-
-        int barColor = getResources().getColor(android.R.color.holo_blue_dark, null);
-        BarDataSet generalDataSet = new BarDataSet(entriesGeneral, "Vendas Gerais");
-        generalDataSet.setColor(barColor);
-        generalDataSet.setValueTextSize(12f);
-
-        BarData barData = new BarData(generalDataSet);
-        generalBarChart.setData(barData);
-
-        Description generalDesc = new Description();
-        generalDesc.setText("Vendas Totais");
-        generalBarChart.setDescription(generalDesc);
-
-        generalBarChart.invalidate(); // Atualizar gráfico de barras
-
-        // Gráfico de pizza - Status de Clientes
-        PieChart statusPieChart = findViewById(R.id.statusPieChart);
-
-        ArrayList<PieEntry> statusEntries = new ArrayList<>();
-        statusEntries.add(new PieEntry(40f, "Potencial"));
-        statusEntries.add(new PieEntry(35f, "Interessado"));
-        statusEntries.add(new PieEntry(25f, "Inscrito Parcial"));
-
-        PieDataSet pieDataSet = new PieDataSet(statusEntries, "Status dos Clientes");
-        pieDataSet.setColors(new int[]{
-                android.R.color.holo_blue_bright,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_green_light
-        }, this);
-        pieDataSet.setValueTextSize(14f);
-        pieDataSet.setValueTextColor(getResources().getColor(android.R.color.black, null));
-
-        PieData pieData = new PieData(pieDataSet);
-        statusPieChart.setData(pieData);
-
-        Description pieDesc = new Description();
-        pieDesc.setText("Distribuição de Status");
-        statusPieChart.setDescription(pieDesc);
-        statusPieChart.setUsePercentValues(true);
-        statusPieChart.setEntryLabelColor(getResources().getColor(android.R.color.black, null));
-
-        statusPieChart.invalidate(); // Atualizar gráfico de pizza
-
-        // Sample data for item_interaction without using classes
-        ArrayList<HashMap<String, String>> interactions = new ArrayList<>();
-        HashMap<String, String> interaction1 = new HashMap<>();
-        interaction1.put("date", "2025-05-09");
-        interaction1.put("type", "Call");
-        interaction1.put("customer", "Customer A");
-        interactions.add(interaction1);
-
-        HashMap<String, String> interaction2 = new HashMap<>();
-        interaction2.put("date", "2025-05-08");
-        interaction2.put("type", "Email");
-        interaction2.put("customer", "Customer B");
-        interactions.add(interaction2);
-
-        HashMap<String, String> interaction3 = new HashMap<>();
-        interaction3.put("date", "2025-05-07");
-        interaction3.put("type", "Meeting");
-        interaction3.put("customer", "Customer C");
-        interactions.add(interaction3);
-
-        // Set up the RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.interactions_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        InteractionAdapter adapter = new InteractionAdapter(interactions);
-        recyclerView.setAdapter(adapter);
-
-
+    private void replaceFragment(Fragment fragment) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 
 
@@ -225,9 +130,11 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
         item1.setOnClickListener(v -> {
             popupWindow.dismiss();
-            Intent it = new Intent(this, PerfilActivity.class);
-            startActivity(it);
+            replaceFragment(new PerfilFragment());
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            bottomNavigation.setSelectedItemId(R.id.page_profile);
         });
+
 
         LinearLayout item2 = popupView.findViewById(R.id.menu_item2);
         item2.setOnClickListener(v -> {
@@ -238,9 +145,9 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item3 = popupView.findViewById(R.id.menu_item3);
         item3.setOnClickListener(v -> {
             popupWindow.dismiss();
-
-            Intent leads_intent = new Intent(this, LeadsActivity.class);
-            startActivity(leads_intent);
+            replaceFragment(new LeadsFragment());
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            bottomNavigation.setSelectedItemId(R.id.page_insights);
         });
 
         LinearLayout item4 = popupView.findViewById(R.id.menu_item4);

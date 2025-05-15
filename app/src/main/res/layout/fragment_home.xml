@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <!-- Filtro de Período -->
+    <Spinner
+        android:id="@+id/time_filter_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/header_include"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:entries="@array/time_filter_options"
+        android:backgroundTint="@color/teal_700"
+        android:padding="8dp" />
+
+    <!-- Layout com 2 gráficos lado a lado -->
+    <LinearLayout
+        android:id="@+id/chartContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/time_filter_spinner"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center">
+
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/generalBarChart"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/statusPieChart"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Lista de Cards com as Últimas Interações -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/interactions_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:layout_constraintTop_toBottomOf="@id/chartContainer"
+        android:orientation="vertical"
+        android:scrollbars="vertical" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
