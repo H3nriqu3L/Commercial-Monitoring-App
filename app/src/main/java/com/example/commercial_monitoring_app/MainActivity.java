@@ -23,6 +23,7 @@ import android.util.DisplayMetrics;
 public class MainActivity extends AppCompatActivity {
     private TextView headerTitle;
     private FloatingActionButton mainFab;
+    private static final int ADD_CLIENT_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
 
         // FAB click listener
         mainFab.setOnClickListener(v -> {
-            // Handle your FAB click action here
+            Intent intent = new Intent(MainActivity.this, AddClientActivity.class);
+            startActivity(intent);
         });
 
 

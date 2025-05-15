@@ -14,4 +14,5 @@
     <string name="menuitem4">Configurações</string>
     <string name="menuitem3">Insights</string>
     <string name="menuitem5">Logout</string>
+    <string name="clientePotencial">Adicionar Cliente Potencial</string>
 </resources>
