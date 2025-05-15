@@ -20,32 +20,38 @@ import android.view.Gravity;
 import android.util.DisplayMetrics;
 
 public class MainActivity extends AppCompatActivity {
+    private TextView headerTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        headerTitle = findViewById(R.id.header);
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
 
         // Home default
         replaceFragment(new HomeFragment());
-
+        headerTitle.setText(R.string.home);
 
         bottomNavigation.setOnItemSelectedListener(item ->{
             int id = item.getItemId();
 
             if (id == R.id.page_home) {
                 replaceFragment(new HomeFragment());
+                headerTitle.setText(R.string.home);
                 return true;
             } else if (id == R.id.page_clients) {
-                replaceFragment(new HomeFragment());
+                replaceFragment(new ClientsFragment());
+                headerTitle.setText(R.string.oportunidades);
                 return true;
             } else if (id == R.id.page_insights) {
                 replaceFragment(new LeadsFragment());
+                headerTitle.setText(R.string.insights);
                 return true;
             } else if (id == R.id.page_profile) {
                 replaceFragment(new PerfilFragment());
+                headerTitle.setText(R.string.perfil);
                 return true;
             }
             return false;
@@ -131,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         item1.setOnClickListener(v -> {
             popupWindow.dismiss();
             replaceFragment(new PerfilFragment());
+            headerTitle.setText(R.string.perfil);
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_profile);
         });
@@ -146,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         item3.setOnClickListener(v -> {
             popupWindow.dismiss();
             replaceFragment(new LeadsFragment());
+            headerTitle.setText(R.string.insights);
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_insights);
         });
