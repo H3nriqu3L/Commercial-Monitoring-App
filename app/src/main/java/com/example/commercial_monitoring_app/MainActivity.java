@@ -19,6 +19,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +48,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //----------------FOOTER SETUP----------------//
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.page_home || itemId == R.id.page_clientes) {
+                // We're already in MainActivity, so we don't need to do anything for these tabs
+                return true;
+            }
+            else if (itemId == R.id.page_insights) {
+                // Launch the LeadsActivity
+                startActivity(new Intent(this, LeadsActivity.class));
+                return true;
+            }
+            else if (itemId == R.id.page_profile) {
+                // Launch the PerfilActivity
+                startActivity(new Intent(this, PerfilActivity.class));
+                return true;
+            }
+
+            return false;
+        });
+
+
+        //---------------- END  FOOTER SETUP----------------//
+
+
 
         // Gráfico de barras - Vendas Gerais
         BarChart generalBarChart = findViewById(R.id.generalBarChart);
@@ -123,6 +152,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         InteractionAdapter adapter = new InteractionAdapter(interactions);
         recyclerView.setAdapter(adapter);
+
+
     }
 
 
