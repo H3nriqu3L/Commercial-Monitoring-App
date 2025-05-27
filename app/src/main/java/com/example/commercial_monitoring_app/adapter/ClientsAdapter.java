@@ -41,8 +41,8 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.ClientVi
     @Override
     public void onBindViewHolder(ClientViewHolder holder, int position) {
         Client client = clients.get(position);
-        holder.cardTitle.setText(client.getTitle());
-        holder.cardDescription.setText(client.getDescription());
+        holder.cardTitle.setText(client.getName());
+        holder.cardDescription.setText(client.getEmail());
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

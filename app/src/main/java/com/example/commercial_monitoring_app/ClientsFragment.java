@@ -43,9 +43,9 @@ public class ClientsFragment extends Fragment {
 
         // Sample data - replace with your actual data source
         List<Client> clientsList = new ArrayList<>();
-        clientsList.add(new Client("Client 1", "Description for client 1"));
-        clientsList.add(new Client("Client 2", "Description for client 2"));
-        clientsList.add(new Client("Client 3", "Description for client 3"));
+        clientsList.add(new Client("Maria Silva", "maria.silva@email.com", "(11) 98765-4321", "123.456.789-01", "15/03/1985"));
+        clientsList.add(new Client("João Santos", "joao.santos@gmail.com", "(21) 99876-5432", "987.654.321-09", "22/07/1990"));
+        clientsList.add(new Client("Ana Costa", "ana.costa@hotmail.com", "(85) 91234-5678", "456.789.123-45", "08/12/1978"));
 
         // Add as many clients as you need
 

@@ -78,22 +78,6 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Campo Descrição -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/descricao_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:hint="Descrição">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edit_descricao"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:minLines="3"
-                    android:gravity="top" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Campo Email -->
             <com.google.android.material.textfield.TextInputLayout
@@ -127,6 +111,38 @@
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Campo CPF-->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/cpf_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="CPF">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_cpf"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Campo Data de Nsscimento -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/dataNascimento_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="Data de nascimento">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edit_dataNascimento"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
             <!-- Botão para salvar -->
             <Button
                 android:id="@+id/btn_salvar"
@@ -135,7 +151,7 @@
                 android:layout_marginTop="24dp"
                 android:text="Salvar"
                 android:textAllCaps="false"
-                android:onClick="salvarCliente" />
+                android:onClick="saveClient" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
