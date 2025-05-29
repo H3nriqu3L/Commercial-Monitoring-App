@@ -1,10 +1,15 @@
 package com.example.commercial_monitoring_app;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,6 +26,7 @@ import java.util.List;
 public class ClientsFragment extends Fragment {
     private ClientsAdapter clientsAdapter;
     private RecyclerView recyclerView;
+
 
     public ClientsFragment(){}
 
@@ -41,20 +47,37 @@ public class ClientsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.clientsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Sample data - replace with your actual data source
-        List<Client> clientsList = new ArrayList<>();
-        clientsList.add(new Client("Maria Silva", "maria.silva@email.com", "(11) 98765-4321", "123.456.789-01", "15/03/1985"));
-        clientsList.add(new Client("João Santos", "joao.santos@gmail.com", "(21) 99876-5432", "987.654.321-09", "22/07/1990"));
-        clientsList.add(new Client("Ana Costa", "ana.costa@hotmail.com", "(85) 91234-5678", "456.789.123-45", "08/12/1978"));
-
-        // Add as many clients as you need
+        List<Client> clientsList = MyApp.getClientList();
+        if (clientsList == null) {
+            clientsList = new ArrayList<>();
+            Log.w("ClientsFragment", "Client list null or empty");
+        }
 
         clientsAdapter = new ClientsAdapter(clientsList);
         recyclerView.setAdapter(clientsAdapter);
 
-        // Optional: Add item decoration for spacing between cards
+
         recyclerView.addItemDecoration(
                 new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
+
+
+    public void refreshClientsList() {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                List<Client> updatedList = MyApp.getClientList();
+                Log.d("ClientsFragment", "Refreshing list with " + updatedList.size() + " clients");
+
+                // new adapter
+                clientsAdapter = new ClientsAdapter(updatedList);
+                recyclerView.setAdapter(clientsAdapter);
+
+                Log.d("ClientsFragment", "Adapter recreated and set");
+            });
+        }
+    }
+
+
+
 
 }

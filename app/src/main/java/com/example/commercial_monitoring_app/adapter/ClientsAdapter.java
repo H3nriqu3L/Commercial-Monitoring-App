@@ -1,5 +1,6 @@
 package com.example.commercial_monitoring_app.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,10 +54,33 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.ClientVi
         });
     }
 
+
     @Override
     public int getItemCount() {
         return clients.size();
     }
+
+    public void updateClientsList(List<Client> newClientsList) {
+        Log.d("ClientsAdapter", "=== UPDATE CLIENTS LIST ===");
+        Log.d("ClientsAdapter", "Current list size: " + this.clients.size());
+        Log.d("ClientsAdapter", "New list size: " + newClientsList.size());
+
+        // Log alguns nomes para ver se os dados estão corretos
+        for (int i = 0; i < Math.min(3, newClientsList.size()); i++) {
+            Log.d("ClientsAdapter", "Client " + i + ": " + newClientsList.get(i).getName());
+        }
+
+        this.clients.clear();
+        this.clients.addAll(newClientsList);
+
+        Log.d("ClientsAdapter", "After update, adapter size: " + this.clients.size());
+        Log.d("ClientsAdapter", "Calling notifyDataSetChanged()");
+
+        notifyDataSetChanged();
+
+        Log.d("ClientsAdapter", "=== END UPDATE ===");
+    }
+
 
 
 }

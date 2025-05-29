@@ -1,13 +1,17 @@
 package com.example.commercial_monitoring_app;
 
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.commercial_monitoring_app.database.DatabaseHelper;
+import com.example.commercial_monitoring_app.model.Client;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -379,7 +383,41 @@ public class AddClientActivity extends AppCompatActivity {
     public void saveClient(View view) {
         try {
             if (validateAllFields()) {
-                Toast.makeText(this, "Cliente salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                String name = nameEditText.getText().toString().trim();
+                String email = emailEditText.getText().toString().trim();
+                String phone = phoneEditText.getText().toString().trim();
+                String cpf = cpfEditText.getText().toString().trim();
+                String birthDate = birthEditText.getText().toString().trim();
+
+                ContentValues values = new ContentValues();
+                values.put("name", name);
+                values.put("email", email);
+                values.put("phoneNumber", phone);
+                values.put("cpf", cpf);
+                values.put("birthDate", birthDate);
+
+
+                long id = DatabaseHelper.getInstance().insert("Client", values);
+
+                if (id != -1) {
+
+                    Client newClient = new Client(name, email, phone, cpf, birthDate);
+
+                    MyApp.getClientList().add(newClient);
+
+                    Toast.makeText(this, "Cliente salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    Log.d("AddClientActivity", "Client added. Total clients: " + MyApp.getClientList().size());
+
+                    Log.d("AddClientActivity", "About to call setResult(RESULT_OK)");
+                    Log.d("AddClientActivity", "RESULT_OK value is: " + RESULT_OK);
+
+                    setResult(RESULT_OK);
+
+                    Log.d("AddClientActivity", "Called setResult, now finishing activity");
+                    finish();
+                } else {
+                    Toast.makeText(this, "Erro ao salvar cliente no banco de dados.", Toast.LENGTH_LONG).show();
+                }
             } else {
                 Toast.makeText(this, "Por favor, corrija os erros antes de salvar", Toast.LENGTH_SHORT).show();
             }

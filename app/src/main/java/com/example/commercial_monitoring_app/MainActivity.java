@@ -1,12 +1,20 @@
 package com.example.commercial_monitoring_app;
 
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.MotionEvent;
+
+import com.example.commercial_monitoring_app.model.Client;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,10 +28,27 @@ import android.widget.Toast;
 import android.view.Gravity;
 import android.util.DisplayMetrics;
 
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private TextView headerTitle;
     private FloatingActionButton mainFab;
-    private static final int ADD_CLIENT_REQUEST_CODE = 1;
+    private ActivityResultLauncher<Intent> addClientLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        Log.d("MainActivity", "Result received: " + result.getResultCode());
+                        Log.d("MainActivity", "RESULT_OK is: " + Activity.RESULT_OK);
+                        Log.d("MainActivity", "RESULT_CANCELED is: " + Activity.RESULT_CANCELED);
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                            Log.d("MainActivity", "Current fragment: " + currentFragment.getClass().getSimpleName());
+                            if (currentFragment instanceof ClientsFragment) {
+                                Log.d("MainActivity", "Calling refresh on ClientsFragment");
+                                ((ClientsFragment) currentFragment).refreshClientsList();
+                            }
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         // FAB click listener
         mainFab.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddClientActivity.class);
-            startActivity(intent);
+            addClientLauncher.launch(intent);
         });
 
 
@@ -185,4 +210,5 @@ public class MainActivity extends AppCompatActivity {
             popupWindow.dismiss();
         });
     }
+
 }
