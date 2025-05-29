@@ -109,16 +109,50 @@ public class AddClientActivity extends AppCompatActivity {
         });
 
         birthEditText.addTextChangedListener(new TextWatcher() {
+            private boolean isUpdating = false;
+            private String previous = "";
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                validateBirthDate();
+                if (isUpdating) return;
+
+                String current = s.toString();
+
+                // Remove all non-digit
+                String digits = current.replaceAll("[^\\d]", "");
+
+
+                StringBuilder formatted = new StringBuilder();
+
+                for (int i = 0; i < digits.length() && i < 8; i++) {
+                    if (i == 2 || i == 4) {
+                        formatted.append("/");
+                    }
+                    formatted.append(digits.charAt(i));
+                }
+
+                String newText = formatted.toString();
+
+
+                if (!newText.equals(current)) {
+                    isUpdating = true;
+                    birthEditText.setText(newText);
+                    birthEditText.setSelection(newText.length());
+                    isUpdating = false;
+                }
+
+                previous = newText;
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+                if (!isUpdating) {
+                    validateBirthDate();
+                }
+            }
         });
 
         phoneEditText.addTextChangedListener(new TextWatcher() {
