@@ -1,3 +1,4 @@
+// HomeFragment.java
 package com.example.commercial_monitoring_app;
 
 import android.os.Bundle;
@@ -7,13 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.core.content.ContextCompat;
 
+import com.example.commercial_monitoring_app.model.Oportunidade;
 import com.example.commercial_monitoring_app.model.Pessoa;
 import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.RetrofitClient;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -24,14 +27,8 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,21 +46,19 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        apiService = RetrofitClient.getApiService();
 
+        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
-        // Configura gráficos (igual ao seu código original)
         setupBarChart(view);
         setupPieChart(view);
 
-        // Setup RecyclerView com adapter vazio por enquanto
         RecyclerView recyclerView = view.findViewById(R.id.interactions_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new InteractionAdapter(interactions);
         recyclerView.setAdapter(adapter);
 
-        // Faz a requisição API para carregar Pessoas e atualizar RecyclerView
-        fetchPessoasFromApi();
+        //fetchPessoasFromApi();
+        fetchOportunidadesFromApi(); // você pode usar esse método alternadamente
 
         return view;
     }
@@ -111,57 +106,97 @@ public class HomeFragment extends Fragment {
     }
 
     private void fetchPessoasFromApi() {
-        ApiService apiService = RetrofitClient.getApiService();
-        Call<List<Pessoa>> call = apiService.listarPessoas();
+        Call<ResponseWrapper<Pessoa>> call = apiService.listarPessoas();
 
-        call.enqueue(new Callback<List<Pessoa>>() {
+        call.enqueue(new Callback<ResponseWrapper<Pessoa>>() {
             @Override
-            public void onResponse(Call<List<Pessoa>> call, Response<List<Pessoa>> response) {
+            public void onResponse(Call<ResponseWrapper<Pessoa>> call, Response<ResponseWrapper<Pessoa>> response) {
                 if (response.isSuccessful()) {
-                    List<Pessoa> pessoas = response.body();
+                    ResponseWrapper<Pessoa> pessoas = response.body();
+                    System.out.println(pessoas.dados);
                     if (pessoas != null) {
                         interactions.clear();
-                        for (Pessoa pessoa : pessoas) {
+                        for (Pessoa pessoa : pessoas.dados.dados) {
                             HashMap<String, String> map = new HashMap<>();
                             map.put("customer", pessoa.getNome());
                             map.put("type", pessoa.getTelefone() != null ? pessoa.getTelefone() : "Sem telefone");
-                            map.put("date", "Data não disponível"); // ou algum valor real, se tiver
-
-                            // Add other fields as needed
+                            map.put("date", "Data não disponível"); // Ajuste conforme o modelo
                             interactions.add(map);
                         }
-
-                        if (adapter != null) {
-                            adapter.notifyDataSetChanged();
-                        }
+                        adapter.notifyDataSetChanged();
                     } else {
-                        Log.e("API_RESPONSE", "Response body is null");
-                        showError("No data received");
+                        showError("Nenhum dado recebido da API");
                     }
                 } else {
                     try {
-                        String errorBody = response.errorBody() != null ?
-                                response.errorBody().string() : "Unknown error";
-                        Log.e("API_RESPONSE", "Unsuccessful response: " + response.code() +
-                                ", Error: " + errorBody);
-                        showError("Error: " + response.code());
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
+                        Log.e("API_RESPONSE", "Erro: " + errorBody);
+                        showError("Erro na API: " + response.code());
                     } catch (IOException e) {
-                        Log.e("API_RESPONSE", "Error parsing error body", e);
-                        showError("Error parsing response");
+                        showError("Erro ao processar resposta");
+                        Log.e("API_RESPONSE", "Exception: ", e);
                     }
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Pessoa>> call, Throwable t) {
-                Log.e("API_FAILURE", "API call failed", t);
-                showError("Network error: " + t.getMessage());
+            public void onFailure(Call<ResponseWrapper<Pessoa>> call, Throwable t) {
+                showError("Erro de rede: " + t.getMessage());
+                Log.e("API_FAILURE", "Erro: ", t);
             }
+
+
         });
     }
 
+    private void fetchOportunidadesFromApi() {
+        Call<ResponseWrapper<Oportunidade>> call = apiService.listarOportunidades();
+
+        call.enqueue(new Callback<ResponseWrapper<Oportunidade>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
+                if (response.isSuccessful()) {
+                    ResponseWrapper<Oportunidade> oportunidades = response.body();
+                    System.out.println(oportunidades.dados);
+                    if (oportunidades != null) {
+                        interactions.clear();
+                        for (Oportunidade oportunidade : oportunidades.dados.dados) {
+                            HashMap<String, String> map = new HashMap<>();
+                            map.put("customer", oportunidade.getPessoaNome());
+                            map.put("type", oportunidade.getEtapaNome() != null ? oportunidade.getEtapaNome() : "Sem razao");
+                            map.put("date", oportunidade.getUltimaAlteracaoEtapa()); // Ajuste conforme o modelo
+                            interactions.add(map);
+                        }
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        showError("Nenhum dado recebido da API");
+                    }
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
+                        Log.e("API_RESPONSE", "Erro: " + errorBody);
+                        showError("Erro na API: " + response.code());
+                    } catch (IOException e) {
+                        showError("Erro ao processar resposta");
+                        Log.e("API_RESPONSE", "Exception: ", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+                showError("Erro de rede: " + t.getMessage());
+                Log.e("API_FAILURE", "Erro: ", t);
+            }
+
+
+        });
+
+
+    }
+
     private void showError(String message) {
-        if (isAdded() && getActivity() != null) {
+        if (isAdded()) {
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
