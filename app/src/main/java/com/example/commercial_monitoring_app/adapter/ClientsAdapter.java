@@ -6,9 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.content.Intent;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.commercial_monitoring_app.ClientInfoActivity;
 import com.example.commercial_monitoring_app.R;
 import com.example.commercial_monitoring_app.model.Client;
 
@@ -58,6 +59,8 @@ public class ClientsAdapter extends RecyclerView.Adapter<ClientsAdapter.ClientVi
             @Override
             public void onClick(View v) {
                 // Handle card click
+                Intent intent = new Intent(v.getContext(), ClientInfoActivity.class);
+                v.getContext().startActivity(intent);
             }
         });
 

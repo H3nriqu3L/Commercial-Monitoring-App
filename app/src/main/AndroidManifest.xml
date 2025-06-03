@@ -32,6 +32,10 @@
             android:name=".AddClientActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".ClientInfoActivity"
+            android:exported="false">
+        </activity>
     </application>
 
 </manifest>
