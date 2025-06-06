@@ -2,21 +2,41 @@ package com.example.commercial_monitoring_app;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.example.commercial_monitoring_app.model.Client;
+import com.example.commercial_monitoring_app.model.Oportunidade;
+import com.example.commercial_monitoring_app.model.Pessoa;
+import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.ResponseWrapper;
+import com.example.commercial_monitoring_app.network.RetrofitClient;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MyApp extends Application {
     private static Context context;
     private static List<Client> clientList;
+    private static List<Oportunidade> oportunidadeList;
 
-    public void onCreate(){
+    private static ApiService apiService;
+
+    @Override
+    public void onCreate() {
         super.onCreate();
         MyApp.context = getApplicationContext();
+        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+        fetchOportunidadesFromApi();
+        fetchClientesFromApi(); // Chamada para buscar os clientes
     }
 
-    public static Context getAppContext(){
+    public static Context getAppContext() {
         return MyApp.context;
     }
 
@@ -26,5 +46,97 @@ public class MyApp extends Application {
 
     public static List<Client> getClientList() {
         return clientList;
+    }
+
+    public static List<Oportunidade> getOportunidadeList() {
+        return oportunidadeList;
+    }
+
+    public static void fetchOportunidadesFromApi() {
+        Call<ResponseWrapper<Oportunidade>> call = apiService.listarOportunidades();
+
+        call.enqueue(new Callback<ResponseWrapper<Oportunidade>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
+                    oportunidadeList = response.body().dados.dados;
+                    Log.d("API", "Oportunidades carregadas: " + oportunidadeList.size());
+                } else {
+                    logAndShowError("Erro na API: " + response.code(), response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+                Log.e("API_FAILURE", "Erro: ", t);
+                showToast("Erro de rede: " + t.getMessage());
+            }
+        });
+    }
+
+    public interface OnOportunidadeDeletedListener {
+        void onOportunidadeDeleted();
+    }
+
+    public static void excluirOportunidadeEAtualizarLista(int oportunidadeId, OnOportunidadeDeletedListener listener) {
+        Call<Void> call = apiService.excluirOportunidade(oportunidadeId);
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    showToast("Oportunidade excluída com sucesso");
+                    fetchOportunidadesFromApi(); // Atualiza a lista após exclusão
+                    if (listener != null) {
+                        listener.onOportunidadeDeleted();
+                    }
+                } else {
+                    logAndShowError("Erro ao excluir: " + response.code(), response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("API_FAILURE", "Erro ao excluir oportunidade: ", t);
+                showToast("Erro de rede ao excluir: " + t.getMessage());
+            }
+        });
+    }
+
+
+    private void fetchClientesFromApi() {
+        Call<ResponseWrapper<Client>> call = apiService.listarPessoas();
+
+        call.enqueue(new Callback<ResponseWrapper<Client>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Client>> call, Response<ResponseWrapper<Client>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
+                    clientList = response.body().dados.dados;
+                    Log.d("API", "Clientes carregados: " + clientList.size());
+                } else {
+                    logAndShowError("Erro na API (clientes): " + response.code(), response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Client>> call, Throwable t) {
+                Log.e("API_FAILURE", "Erro ao buscar clientes: ", t);
+                showToast("Erro de rede ao buscar clientes: " + t.getMessage());
+            }
+        });
+    }
+
+    private static void logAndShowError(String message, Response<?> response) {
+        try {
+            String errorBody = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
+            Log.e("API_RESPONSE", "Erro: " + errorBody);
+        } catch (IOException e) {
+            Log.e("API_RESPONSE", "Exception ao ler erro: ", e);
+        }
+        showToast(message);
+    }
+
+    private static void showToast(String message) {
+        Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
     }
 }

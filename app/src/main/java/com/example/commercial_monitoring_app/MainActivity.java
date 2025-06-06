@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                 mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_clients) {
-                replaceFragment(new ClientsFragment());
+                replaceFragment(new OportunidadesFragment());
                 headerTitle.setText(R.string.oportunidades);
                 mainFab.setVisibility(View.VISIBLE);
                 return true;

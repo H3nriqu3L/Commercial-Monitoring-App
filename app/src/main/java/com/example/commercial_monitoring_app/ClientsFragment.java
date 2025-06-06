@@ -86,18 +86,7 @@ public class ClientsFragment extends Fragment {
     // Handle actual deletion
     private void deleteClient(int position, Client client) {
         try {
-            // remove from database
-            deleteFromDatabase(client);
-
-            // Remove from MyApp's client list
-            List<Client> currentList = MyApp.getClientList();
-            currentList.remove(position);
-
-            // Update the adapter
-            clientsAdapter.notifyItemRemoved(position);
-
-            Log.d("ClientsFragment", "Client deleted: " + client.getName());
-
+           // MyApp.excluirOportunidadeEAtualizarLista(client.getId());
             if (getContext() != null) {
                 Toast.makeText(getContext(), "Cliente deletado com sucesso!", Toast.LENGTH_SHORT).show();
             }

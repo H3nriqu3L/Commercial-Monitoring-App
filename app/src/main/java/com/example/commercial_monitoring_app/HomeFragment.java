@@ -31,23 +31,17 @@ import com.github.mikephil.charting.data.PieEntry;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
 
     private InteractionAdapter adapter;
     private ArrayList<HashMap<String, String>> interactions = new ArrayList<>();
-    private ApiService apiService;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
         setupBarChart(view);
         setupPieChart(view);
@@ -56,9 +50,6 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         adapter = new InteractionAdapter(interactions);
         recyclerView.setAdapter(adapter);
-
-        //fetchPessoasFromApi();
-        fetchOportunidadesFromApi(); // você pode usar esse método alternadamente
 
         return view;
     }
@@ -105,99 +96,5 @@ public class HomeFragment extends Fragment {
         statusPieChart.invalidate();
     }
 
-    private void fetchPessoasFromApi() {
-        Call<ResponseWrapper<Pessoa>> call = apiService.listarPessoas();
 
-        call.enqueue(new Callback<ResponseWrapper<Pessoa>>() {
-            @Override
-            public void onResponse(Call<ResponseWrapper<Pessoa>> call, Response<ResponseWrapper<Pessoa>> response) {
-                if (response.isSuccessful()) {
-                    ResponseWrapper<Pessoa> pessoas = response.body();
-                    System.out.println(pessoas.dados);
-                    if (pessoas != null) {
-                        interactions.clear();
-                        for (Pessoa pessoa : pessoas.dados.dados) {
-                            HashMap<String, String> map = new HashMap<>();
-                            map.put("customer", pessoa.getNome());
-                            map.put("type", pessoa.getTelefone() != null ? pessoa.getTelefone() : "Sem telefone");
-                            map.put("date", "Data não disponível"); // Ajuste conforme o modelo
-                            interactions.add(map);
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        showError("Nenhum dado recebido da API");
-                    }
-                } else {
-                    try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
-                        Log.e("API_RESPONSE", "Erro: " + errorBody);
-                        showError("Erro na API: " + response.code());
-                    } catch (IOException e) {
-                        showError("Erro ao processar resposta");
-                        Log.e("API_RESPONSE", "Exception: ", e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseWrapper<Pessoa>> call, Throwable t) {
-                showError("Erro de rede: " + t.getMessage());
-                Log.e("API_FAILURE", "Erro: ", t);
-            }
-
-
-        });
-    }
-
-    private void fetchOportunidadesFromApi() {
-        Call<ResponseWrapper<Oportunidade>> call = apiService.listarOportunidades();
-
-        call.enqueue(new Callback<ResponseWrapper<Oportunidade>>() {
-            @Override
-            public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
-                if (response.isSuccessful()) {
-                    ResponseWrapper<Oportunidade> oportunidades = response.body();
-                    System.out.println(oportunidades.dados);
-                    if (oportunidades != null) {
-                        interactions.clear();
-                        for (Oportunidade oportunidade : oportunidades.dados.dados) {
-                            HashMap<String, String> map = new HashMap<>();
-                            map.put("customer", oportunidade.getPessoaNome());
-                            map.put("type", oportunidade.getEtapaNome() != null ? oportunidade.getEtapaNome() : "Sem razao");
-                            map.put("date", oportunidade.getUltimaAlteracaoEtapa()); // Ajuste conforme o modelo
-                            interactions.add(map);
-                        }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        showError("Nenhum dado recebido da API");
-                    }
-                } else {
-                    try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
-                        Log.e("API_RESPONSE", "Erro: " + errorBody);
-                        showError("Erro na API: " + response.code());
-                    } catch (IOException e) {
-                        showError("Erro ao processar resposta");
-                        Log.e("API_RESPONSE", "Exception: ", e);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
-                showError("Erro de rede: " + t.getMessage());
-                Log.e("API_FAILURE", "Erro: ", t);
-            }
-
-
-        });
-
-
-    }
-
-    private void showError(String message) {
-        if (isAdded()) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        }
-    }
 }
