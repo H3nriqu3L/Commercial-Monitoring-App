@@ -32,6 +32,7 @@
             android:name=".AddClientActivity"
             android:exported="false">
         </activity>
+        <activity android:name=".OportunidadeDetailActivity" />
     </application>
 
 </manifest>
