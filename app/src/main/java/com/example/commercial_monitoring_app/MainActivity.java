@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
                         if (result.getResultCode() == Activity.RESULT_OK) {
                             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
                             Log.d("MainActivity", "Current fragment: " + currentFragment.getClass().getSimpleName());
-                            if (currentFragment instanceof ClientsFragment) {
-                                Log.d("MainActivity", "Calling refresh on ClientsFragment");
+                            if (currentFragment instanceof OportunidadesFragment) {
+                                ((OportunidadesFragment) currentFragment).refreshOportunidades();
+                            } else if (currentFragment instanceof ClientsFragment) {
                                 ((ClientsFragment) currentFragment).refreshClientsList();
                             }
                         }

@@ -32,7 +32,7 @@ public class MyApp extends Application {
         super.onCreate();
         MyApp.context = getApplicationContext();
         apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
-        fetchOportunidadesFromApi();
+        fetchOportunidadesFromApi(null);
         fetchClientesFromApi(); // Chamada para buscar os clientes
     }
 
@@ -52,7 +52,11 @@ public class MyApp extends Application {
         return oportunidadeList;
     }
 
-    public static void fetchOportunidadesFromApi() {
+    public void setOportunidadesList(List<Oportunidade> newList) {
+        this.oportunidadeList = newList;
+    }
+
+    public static void fetchOportunidadesFromApi(Callback<ResponseWrapper<Oportunidade>> callback) {
         Call<ResponseWrapper<Oportunidade>> call = apiService.listarOportunidades();
 
         call.enqueue(new Callback<ResponseWrapper<Oportunidade>>() {
@@ -64,12 +68,18 @@ public class MyApp extends Application {
                 } else {
                     logAndShowError("Erro na API: " + response.code(), response);
                 }
+                if (callback != null) {
+                    callback.onResponse(call, response);
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
                 Log.e("API_FAILURE", "Erro: ", t);
                 showToast("Erro de rede: " + t.getMessage());
+                if (callback != null) {
+                    callback.onFailure(call, t);
+                }
             }
         });
     }
@@ -86,10 +96,22 @@ public class MyApp extends Application {
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
                     showToast("Oportunidade excluída com sucesso");
-                    fetchOportunidadesFromApi(); // Atualiza a lista após exclusão
-                    if (listener != null) {
-                        listener.onOportunidadeDeleted();
-                    }
+                    // Fetch updated list and then notify
+                    fetchOportunidadesFromApi(new Callback<ResponseWrapper<Oportunidade>>() {
+                        @Override
+                        public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
+                            if (listener != null) {
+                                listener.onOportunidadeDeleted();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+                            if (listener != null) {
+                                listener.onOportunidadeDeleted();
+                            }
+                        }
+                    });
                 } else {
                     logAndShowError("Erro ao excluir: " + response.code(), response);
                 }

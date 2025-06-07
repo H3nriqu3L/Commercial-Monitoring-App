@@ -70,6 +70,11 @@ public class OportunidadesFragment extends Fragment {
 
     private void deleteOportunidade(int position, Oportunidade oportunidade) {
         try {
+            // Remove imediatamente da lista local
+            List<Oportunidade> currentList = MyApp.getOportunidadeList();
+            currentList.remove(position);
+            oportunidadesAdapter.notifyItemRemoved(position);
+
             MyApp.excluirOportunidadeEAtualizarLista(Integer.parseInt(oportunidade.getId()),
                     new MyApp.OnOportunidadeDeletedListener() {
                         @Override
@@ -80,27 +85,11 @@ public class OportunidadesFragment extends Fragment {
         } catch (Exception e) {
             Log.e("OportunidadesFragment", "Erro ao deletar oportunidade", e);
             Toast.makeText(getContext(), "Erro ao deletar oportunidade", Toast.LENGTH_SHORT).show();
+            // Reverte a UI em caso de erro
+            oportunidadesAdapter.notifyItemChanged(position);
         }
     }
 
-    private void deleteFromDatabase(Oportunidade oportunidade) {
-        try {
-            DatabaseHelper dbHelper = DatabaseHelper.getInstance();
-
-            String whereClause = "id = " + oportunidade.getId(); // use appropriate condition
-            int deletedRows = dbHelper.delete("Oportunidade", whereClause);
-
-            if (deletedRows > 0) {
-                Log.d("OportunidadesFragment", "Oportunidade removida do DB: ID " + oportunidade.getId());
-            } else {
-                Log.w("OportunidadesFragment", "Nenhuma oportunidade encontrada com ID: " + oportunidade.getId());
-            }
-
-        } catch (Exception e) {
-            Log.e("OportunidadesFragment", "Erro ao deletar do DB", e);
-            throw e;
-        }
-    }
 
     public void refreshOportunidadesList() {
         if (getActivity() != null) {
@@ -112,6 +101,21 @@ public class OportunidadesFragment extends Fragment {
                     showDeleteConfirmation(position, oportunidade);
                 });
                 recyclerView.setAdapter(oportunidadesAdapter);
+
+                Log.d("OportunidadesFragment", "Adapter atualizado");
+            });
+        }
+    }
+
+    public void refreshOportunidades() {
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                List<Oportunidade> updatedList = MyApp.getOportunidadeList();
+                Log.d("OportunidadesFragment", "Atualizando lista com " + updatedList.size() + " oportunidades");
+
+                if (oportunidadesAdapter != null) {
+                    oportunidadesAdapter.updateData(updatedList);
+                }
 
                 Log.d("OportunidadesFragment", "Adapter atualizado");
             });
