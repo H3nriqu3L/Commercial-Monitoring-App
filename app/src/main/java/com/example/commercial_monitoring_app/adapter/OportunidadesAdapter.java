@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.commercial_monitoring_app.MyApp;
@@ -95,9 +97,40 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         return oportunidades.size();
     }
 
-    public void updateOportunidadesList(List<Oportunidade> novaLista) {
-        oportunidades.clear();
-        oportunidades.addAll(novaLista);
-        notifyDataSetChanged();
+    public void updateData(List<Oportunidade> newList) {
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(new OportunidadeDiffCallback(this.oportunidades, newList));
+        this.oportunidades.clear();
+        this.oportunidades.addAll(newList);
+        result.dispatchUpdatesTo(this);
+    }
+
+    static class OportunidadeDiffCallback extends DiffUtil.Callback {
+        private final List<Oportunidade> oldList;
+        private final List<Oportunidade> newList;
+
+        OportunidadeDiffCallback(List<Oportunidade> oldList, List<Oportunidade> newList) {
+            this.oldList = oldList;
+            this.newList = newList;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return oldList.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return newList.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).getId().equals(newList.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return oldList.get(oldItemPosition).equals(newList.get(newItemPosition));
+        }
     }
 }
