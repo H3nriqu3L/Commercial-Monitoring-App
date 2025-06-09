@@ -23,12 +23,12 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_oportunidade_detail);
 
         // Setup toolbar with back button
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+        //Toolbar toolbar = findViewById(R.id.toolbar);
+       // setSupportActionBar(toolbar);
+//        if (getSupportActionBar() != null) {
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//            getSupportActionBar().setDisplayShowHomeEnabled(true);
+//        }
 
         TextView title = findViewById(R.id.detailTitle);
         TextView status = findViewById(R.id.detailStatus);
@@ -98,5 +98,9 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void navigateBack(View view) {
+        finish();
     }
 }

@@ -32,6 +32,7 @@ public class Client {
     private String desinscreveu;
     private String usuario_id;
 
+
     public Client(String name, String email, String phone, String cpf, String birthDate) {
         this.nome = name;
         this.email = email;

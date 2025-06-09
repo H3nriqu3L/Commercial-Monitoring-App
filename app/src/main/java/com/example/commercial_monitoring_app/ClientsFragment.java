@@ -20,8 +20,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.commercial_monitoring_app.adapter.ClientsAdapter;
+import com.example.commercial_monitoring_app.adapter.OportunidadesAdapter;
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
 import com.example.commercial_monitoring_app.model.Client;
+import com.example.commercial_monitoring_app.model.Oportunidade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,9 +88,10 @@ public class ClientsFragment extends Fragment {
     // Handle actual deletion
     private void deleteClient(int position, Client client) {
         try {
-           // MyApp.excluirOportunidadeEAtualizarLista(client.getId());
+            //MyApp.excluirOportunidadeEAtualizarLista(client.getId());
             if (getContext() != null) {
                 Toast.makeText(getContext(), "Cliente deletado com sucesso!", Toast.LENGTH_SHORT).show();
+                refreshClientsList();
             }
 
         } catch (Exception e) {
@@ -142,7 +145,6 @@ public class ClientsFragment extends Fragment {
             });
         }
     }
-
 
 
 
