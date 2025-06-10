@@ -32,18 +32,23 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         this.deleteListener = deleteListener;
     }
 
+    public OportunidadesAdapter(List<Oportunidade> oportunidades) {
+        this.oportunidades = oportunidades;
+        this.deleteListener = null;
+    }
+
     public static class OportunidadeViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView subtitle;
         TextView etapaStatus;
-        ImageView deleteIcon;
+        // ImageView deleteIcon; // Commented out - delete icon removed from layout
 
         public OportunidadeViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.oportunidadeTitle);
             subtitle = itemView.findViewById(R.id.oportunidadeSubtitle);
             etapaStatus = itemView.findViewById(R.id.oportunidadeEtapaStatus);
-            deleteIcon = itemView.findViewById(R.id.deleteOportunidadeIcon);
+            // deleteIcon = itemView.findViewById(R.id.deleteOportunidadeIcon); // Commented out - ID doesn't exist
         }
     }
 
@@ -84,12 +89,17 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             context.startActivity(intent);
         });
 
-        holder.deleteIcon.setOnClickListener(v -> {
-            int currentPosition = holder.getAdapterPosition();
-            if (deleteListener != null && currentPosition != RecyclerView.NO_POSITION) {
-                deleteListener.onDeleteClick(currentPosition, oportunidade);
-            }
-        });
+        // DELETE ICON FUNCTIONALITY - COMMENTED OUT (delete icon removed from layout)
+        /*
+        if (holder.deleteIcon != null && deleteListener != null) {
+            holder.deleteIcon.setOnClickListener(v -> {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    deleteListener.onDeleteClick(currentPosition, oportunidade);
+                }
+            });
+        }
+        */
     }
 
     @Override

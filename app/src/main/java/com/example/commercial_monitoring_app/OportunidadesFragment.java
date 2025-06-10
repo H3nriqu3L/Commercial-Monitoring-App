@@ -62,17 +62,15 @@ public class OportunidadesFragment extends Fragment {
         filteredOportunidades = new ArrayList<>(oportunidadesList);
 
         // Setup adapter
-        oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades, (position, oportunidade) -> {
-            showDeleteConfirmation(position, oportunidade);
-        });
+        oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades);
 
 
         recyclerView.setAdapter(oportunidadesAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
-    private void showFilterMenu(View anchor) {
-        PopupMenu popup = new PopupMenu(getContext(), anchor);
+    private void showFilterMenu(View view) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
         popup.getMenuInflater().inflate(R.menu.filter_menu, popup.getMenu());
 
         popup.setOnMenuItemClickListener(item -> {
@@ -135,7 +133,7 @@ public class OportunidadesFragment extends Fragment {
 
         oportunidadesAdapter.updateData(newFilteredList);
 
-        Toast.makeText(getContext(), filterType + " - " + newFilteredList.size() + " items", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(), filterType + " - " + newFilteredList.size() + " items", Toast.LENGTH_SHORT).show();
     }
 
     private void showDeleteConfirmation(int position, Oportunidade oportunidade) {
@@ -178,9 +176,7 @@ public class OportunidadesFragment extends Fragment {
                 List<Oportunidade> updatedList = MyApp.getOportunidadeList();
                 Log.d("OportunidadesFragment", "Atualizando lista com " + updatedList.size() + " oportunidades");
 
-                oportunidadesAdapter = new OportunidadesAdapter(updatedList, (position, oportunidade) -> {
-                    showDeleteConfirmation(position, oportunidade);
-                });
+                oportunidadesAdapter = new OportunidadesAdapter(updatedList); // Changed to single parameter
                 recyclerView.setAdapter(oportunidadesAdapter);
 
                 Log.d("OportunidadesFragment", "Adapter atualizado");
