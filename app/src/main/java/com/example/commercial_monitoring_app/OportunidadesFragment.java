@@ -4,8 +4,11 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,6 +29,9 @@ public class OportunidadesFragment extends Fragment {
 
     private OportunidadesAdapter oportunidadesAdapter;
     private RecyclerView recyclerView;
+    List<Oportunidade> oportunidadesList;
+    private List<Oportunidade> filteredOportunidades;
+    private String currentFilter = "all";
 
     public OportunidadesFragment() {}
 
@@ -33,7 +39,7 @@ public class OportunidadesFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_oportunidades, container, false); // make sure this layout exists
+        return inflater.inflate(R.layout.fragment_oportunidades, container, false);
     }
 
     @Override
@@ -42,19 +48,94 @@ public class OportunidadesFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.oportunidadesRecyclerView); // use correct ID
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        ImageView filterIcon = view.findViewById(R.id.filterIcon);
+        filterIcon.setOnClickListener(v -> showFilterMenu(v));
 
-        List<Oportunidade> oportunidadesList = MyApp.getOportunidadeList(); // replace with your actual getter
+        // Get original data (keep this as your source of truth)
+        oportunidadesList = MyApp.getOportunidadeList();
         if (oportunidadesList == null) {
             oportunidadesList = new ArrayList<>();
             Log.w("OportunidadesFragment", "Oportunidade list is null or empty");
         }
 
-        oportunidadesAdapter = new OportunidadesAdapter(oportunidadesList, (position, oportunidade) -> {
+        // Create initial filtered list (copy of original)
+        filteredOportunidades = new ArrayList<>(oportunidadesList);
+
+        // Setup adapter
+        oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades, (position, oportunidade) -> {
             showDeleteConfirmation(position, oportunidade);
         });
 
+
         recyclerView.setAdapter(oportunidadesAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+    }
+
+    private void showFilterMenu(View anchor) {
+        PopupMenu popup = new PopupMenu(getContext(), anchor);
+        popup.getMenuInflater().inflate(R.menu.filter_menu, popup.getMenu());
+
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.filter_all) {
+
+                applyFilter("all");
+                return true;
+            } else if (itemId == R.id.filter_alerta) {
+
+                applyFilter("alerta");
+                return true;
+            } else if (itemId == R.id.filter_evadidos) {
+
+                applyFilter("evadidos");
+                return true;
+            } else if (itemId == R.id.filter_regulares  ) {
+
+                applyFilter("regulares");
+                return true;
+            }
+            return false;
+        });
+
+        popup.show();
+    }
+
+    private void applyFilter(String filterType) {
+        List<Oportunidade> newFilteredList = new ArrayList<>();
+
+        switch (filterType) {
+            case "all":
+                newFilteredList.addAll(oportunidadesList); // original list
+                break;
+
+            case "alerta":
+                for (Oportunidade oportunidade : oportunidadesList) {
+                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Em Alerta")) {
+                        newFilteredList.add(oportunidade);
+                    }
+                }
+                break;
+
+            case "evadidos":
+                for (Oportunidade oportunidade : oportunidadesList) {
+                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Evadidos")) {
+                        newFilteredList.add(oportunidade);
+                    }
+                }
+                break;
+
+            case "regulares":
+                for (Oportunidade oportunidade : oportunidadesList) {
+                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Alunos Regulares")) {
+                        newFilteredList.add(oportunidade);
+                    }
+                }
+                break;
+        }
+
+        oportunidadesAdapter.updateData(newFilteredList);
+
+        Toast.makeText(getContext(), filterType + " - " + newFilteredList.size() + " items", Toast.LENGTH_SHORT).show();
     }
 
     private void showDeleteConfirmation(int position, Oportunidade oportunidade) {

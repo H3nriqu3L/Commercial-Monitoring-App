@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/filter_all"
+        android:title="Todos" />
+    <item android:id="@+id/filter_alerta"
+        android:title="Em Alerta" />
+    <item android:id="@+id/filter_evadidos"
+        android:title="Evadidos" />
+    <item android:id="@+id/filter_regulares"
+        android:title="Regulares" />
+</menu>
