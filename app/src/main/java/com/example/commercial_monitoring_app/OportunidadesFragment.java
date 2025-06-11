@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,8 @@ public class OportunidadesFragment extends Fragment {
     List<Oportunidade> oportunidadesList;
     private List<Oportunidade> filteredOportunidades;
     private String currentFilter = "all";
+    private String currentSearchQuery = "";
+    private SearchView searchView;
 
     public OportunidadesFragment() {}
 
@@ -51,7 +54,7 @@ public class OportunidadesFragment extends Fragment {
         ImageView filterIcon = view.findViewById(R.id.filterIcon);
         filterIcon.setOnClickListener(v -> showFilterMenu(v));
 
-        // Get original data (keep this as your source of truth)
+
         oportunidadesList = MyApp.getOportunidadeList();
         if (oportunidadesList == null) {
             oportunidadesList = new ArrayList<>();
@@ -61,12 +64,46 @@ public class OportunidadesFragment extends Fragment {
         // Create initial filtered list (copy of original)
         filteredOportunidades = new ArrayList<>(oportunidadesList);
 
-        // Setup adapter
         oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades);
+
+
 
 
         recyclerView.setAdapter(oportunidadesAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+        //Search Setup
+        searchView = view.findViewById(R.id.searchView);
+        if (searchView != null) {
+            setupSearchView();
+        } else {
+            Log.e("OportunidadesFragment", "SearchView not found in layout");
+        }
+    }
+
+    private void setupSearchView() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                currentSearchQuery = query;
+                applyFiltersAndSearch();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                currentSearchQuery = newText;
+                applyFiltersAndSearch();
+                return true;
+            }
+        });
+
+        // Optional: Handle search view close
+        searchView.setOnCloseListener(() -> {
+            currentSearchQuery = "";
+            applyFiltersAndSearch();
+            return false;
+        });
     }
 
     private void showFilterMenu(View view) {
@@ -98,12 +135,13 @@ public class OportunidadesFragment extends Fragment {
         popup.show();
     }
 
-    private void applyFilter(String filterType) {
+    private void applyFiltersAndSearch() {
         List<Oportunidade> newFilteredList = new ArrayList<>();
 
-        switch (filterType) {
+        // First apply the filter
+        switch (currentFilter) {
             case "all":
-                newFilteredList.addAll(oportunidadesList); // original list
+                newFilteredList.addAll(oportunidadesList);
                 break;
 
             case "alerta":
@@ -131,9 +169,26 @@ public class OportunidadesFragment extends Fragment {
                 break;
         }
 
-        oportunidadesAdapter.updateData(newFilteredList);
+        // After applying search filter
+        if (!currentSearchQuery.isEmpty()) {
+            List<Oportunidade> searchFilteredList = new ArrayList<>();
+            String searchLower = currentSearchQuery.toLowerCase().trim();
 
-        //Toast.makeText(getContext(), filterType + " - " + newFilteredList.size() + " items", Toast.LENGTH_SHORT).show();
+            for (Oportunidade oportunidade : newFilteredList) {
+                if (oportunidade.getPessoaNome() != null &&
+                        oportunidade.getPessoaNome().toLowerCase().contains(searchLower)) {
+                    searchFilteredList.add(oportunidade);
+                }
+            }
+            newFilteredList = searchFilteredList;
+        }
+
+        oportunidadesAdapter.updateData(newFilteredList);
+    }
+
+    private void applyFilter(String filterType) {
+        currentFilter = filterType;
+        applyFiltersAndSearch();
     }
 
     private void showDeleteConfirmation(int position, Oportunidade oportunidade) {
