@@ -32,6 +32,8 @@ public class Client {
     private String desinscreveu;
     private String usuario_id;
 
+    private String imagem;
+
 
     public Client(String name, String email, String phone, String cpf, String birthDate) {
         this.nome = name;
@@ -43,6 +45,9 @@ public class Client {
     // Getters and Setters
     public int getId() { return Integer.parseInt(id) ; }
     public void setId(String id) { this.id = id; }
+
+    public String getImagem(){return imagem;}
+    public void setImagem(String imagem){this.imagem=imagem;}
 
     public String getPessoaprincipal_id() { return pessoaprincipal_id; }
     public void setPessoaprincipal_id(String pessoaprincipal_id) { this.pessoaprincipal_id = pessoaprincipal_id; }

@@ -7,13 +7,14 @@ import android.widget.Toast;
 
 import com.example.commercial_monitoring_app.model.Client;
 import com.example.commercial_monitoring_app.model.Oportunidade;
-import com.example.commercial_monitoring_app.model.Pessoa;
+import com.example.commercial_monitoring_app.model.PersonalData;
 import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.PersonalDataResponse;
 import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.RetrofitClient;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -22,8 +23,9 @@ import retrofit2.Response;
 
 public class MyApp extends Application {
     private static Context context;
-    private static List<Client> clientList;
-    private static List<Oportunidade> oportunidadeList;
+    private static List<Client> clientList = new ArrayList<>();
+    private static List<Oportunidade> oportunidadeList = new ArrayList<>();
+    private static List<PersonalData> personalDataList = new ArrayList<>();
 
     private static ApiService apiService;
 
@@ -32,8 +34,11 @@ public class MyApp extends Application {
         super.onCreate();
         MyApp.context = getApplicationContext();
         apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+
+        // Make API calls sequentially or handle them properly
         fetchOportunidadesFromApi(null);
-        fetchClientesFromApi(); // Chamada para buscar os clientes
+        fetchClientesFromApi();
+        fetchPersonalDataFromApi();
     }
 
     public static Context getAppContext() {
@@ -41,19 +46,27 @@ public class MyApp extends Application {
     }
 
     public static void setClientList(List<Client> list) {
-        clientList = list;
+        clientList = list != null ? list : new ArrayList<>();
     }
 
     public static List<Client> getClientList() {
-        return clientList;
+        return clientList != null ? clientList : new ArrayList<>();
     }
 
     public static List<Oportunidade> getOportunidadeList() {
-        return oportunidadeList;
+        return oportunidadeList != null ? oportunidadeList : new ArrayList<>();
+    }
+
+    public static List<PersonalData> getPersonalDataList() {
+        return personalDataList != null ? personalDataList : new ArrayList<>();
     }
 
     public void setOportunidadesList(List<Oportunidade> newList) {
-        this.oportunidadeList = newList;
+        this.oportunidadeList = newList != null ? newList : new ArrayList<>();
+    }
+
+    public static void setPersonalDataList(List<PersonalData> list) {
+        personalDataList = list != null ? list : new ArrayList<>();
     }
 
     public static void fetchOportunidadesFromApi(Callback<ResponseWrapper<Oportunidade>> callback) {
@@ -63,7 +76,7 @@ public class MyApp extends Application {
             @Override
             public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
-                    oportunidadeList = response.body().dados.dados;
+                    oportunidadeList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
                     Log.d("API", "Oportunidades carregadas: " + oportunidadeList.size());
                 } else {
                     logAndShowError("Erro na API: " + response.code(), response);
@@ -125,7 +138,6 @@ public class MyApp extends Application {
         });
     }
 
-
     private void fetchClientesFromApi() {
         Call<ResponseWrapper<Client>> call = apiService.listarPessoas();
 
@@ -133,7 +145,7 @@ public class MyApp extends Application {
             @Override
             public void onResponse(Call<ResponseWrapper<Client>> call, Response<ResponseWrapper<Client>> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
-                    clientList = response.body().dados.dados;
+                    clientList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
                     Log.d("API", "Clientes carregados: " + clientList.size());
                 } else {
                     logAndShowError("Erro na API (clientes): " + response.code(), response);
@@ -144,6 +156,28 @@ public class MyApp extends Application {
             public void onFailure(Call<ResponseWrapper<Client>> call, Throwable t) {
                 Log.e("API_FAILURE", "Erro ao buscar clientes: ", t);
                 showToast("Erro de rede ao buscar clientes: " + t.getMessage());
+            }
+        });
+    }
+
+    private void fetchPersonalDataFromApi() {
+        Call<PersonalDataResponse> call = apiService.searchPersonalData();
+
+        call.enqueue(new Callback<PersonalDataResponse>() {
+            @Override
+            public void onResponse(Call<PersonalDataResponse> call, Response<PersonalDataResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
+                    personalDataList = response.body().dados;  // <- Remove the second .dados
+                    Log.d("API", "Personal Data carregados: " + personalDataList.size());
+                } else {
+                    logAndShowError("Erro na API (personal data): " + response.code(), response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PersonalDataResponse> call, Throwable t) {  // <- New type
+                Log.e("API_FAILURE", "Erro ao buscar personalData: ", t);
+                showToast("Erro de rede ao buscar personal data: " + t.getMessage());
             }
         });
     }
@@ -159,6 +193,8 @@ public class MyApp extends Application {
     }
 
     private static void showToast(String message) {
-        Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+        if (getAppContext() != null) {
+            Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 }

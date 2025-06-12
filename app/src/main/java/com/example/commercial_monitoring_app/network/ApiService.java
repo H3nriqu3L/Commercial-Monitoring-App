@@ -2,10 +2,7 @@ package com.example.commercial_monitoring_app.network;
 
 import com.example.commercial_monitoring_app.model.Client;
 import com.example.commercial_monitoring_app.model.Oportunidade;
-import com.example.commercial_monitoring_app.model.Pessoa;
-
-import java.sql.Wrapper;
-import java.util.List;
+import com.example.commercial_monitoring_app.model.PersonalData;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -38,4 +35,11 @@ public interface ApiService {
     Call<Void> excluirOportunidade(
             @Field("id") int oportunidadeId
     );
+
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Contato/dadosPessoas")
+    Call<PersonalDataResponse> searchPersonalData();  // <- Change return type
 }
