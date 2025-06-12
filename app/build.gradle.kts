@@ -38,6 +38,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)

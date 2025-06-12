@@ -41,5 +41,5 @@ public interface ApiService {
             "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
     })
     @POST("api/Contato/dadosPessoas")
-    Call<PersonalDataResponse> searchPersonalData();  // <- Change return type
+    Call<PersonalDataResponse> searchPersonalData();
 }

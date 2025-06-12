@@ -8,5 +8,6 @@
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
     <color name="colorDefault">#cce3e4</color>
+    <color name="colorDetailInfo">#4D6C73</color>
     <color name="floatButtonColor">#0ca4a5</color>
 </resources>

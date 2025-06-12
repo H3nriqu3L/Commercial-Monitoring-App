@@ -1,7 +1,10 @@
 package com.example.commercial_monitoring_app.adapter;
 
+import static com.example.commercial_monitoring_app.MyApp.getPersonalDataList;
+
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +19,11 @@ import com.example.commercial_monitoring_app.OportunidadeDetailActivity;
 import com.example.commercial_monitoring_app.R;
 import com.example.commercial_monitoring_app.model.Client;
 import com.example.commercial_monitoring_app.model.Oportunidade;
+import com.example.commercial_monitoring_app.model.PersonalData;
+
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdapter.OportunidadeViewHolder> {
 
@@ -63,11 +70,39 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         Oportunidade oportunidade = oportunidades.get(position);
 
         Client cliente = MyApp.getClientList().stream().filter(c -> String.valueOf(c.getId()).equals(oportunidade.getPessoa())).findFirst().orElse(null);
+        String responsavel = "Sem responsável";
+
+
+
+
+
         holder.title.setText(oportunidade.getPessoaNome());
-        holder.subtitle.setText("Origem: " + oportunidade.getOrigemNome() + " | Agendamento: " + oportunidade.getAgendamentoNome());
-        holder.etapaStatus.setText("Etapa: " + oportunidade.getEtapaNome() + " | Status: " + oportunidade.getStatusNome());
+        holder.subtitle.setText("Agendamento: " + oportunidade.getAgendamentoNome() + " | Responsável: " + responsavel);
+        holder.etapaStatus.setText("Etapa: " + oportunidade.getEtapaNome() );
+
+
 
         holder.itemView.setOnClickListener(v -> {
+            final String id = String.valueOf(cliente.getId());
+            List<PersonalData> personalDataList = MyApp.getPersonalDataList();
+            Log.d("ADAPTER_DEBUG", "ID procurado: " + id);
+            Log.d("ADAPTER_DEBUG", "Lista size: " + (personalDataList != null ? personalDataList.size() : "null"));
+            String imagem = null;
+            if (id != null && personalDataList != null) {
+                Optional<String> imagemResult = personalDataList.stream()
+                        .filter(Objects::nonNull)
+                        .filter(personalData -> id.equals(personalData.getId()))
+                        .map(PersonalData::getImagem)
+                        .filter(img -> img != null && !img.isEmpty())
+                        .findFirst();
+
+                if (imagemResult.isPresent()) {
+                    imagem = imagemResult.get();
+                }
+            }
+
+            Log.d("ADAPTER_DEBUG", "Imagem url: " + (imagem));
+
             Context context = v.getContext();
             Intent intent = new Intent(context, OportunidadeDetailActivity.class);
             intent.putExtra(OportunidadeDetailActivity.EXTRA_OPORTUNIDADE_NAME, oportunidade.getPessoaNome());
@@ -85,21 +120,11 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
                 intent.putExtra("client_endereco", cliente.getEndereco());
                 intent.putExtra("client_bairro", cliente.getBairro());
                 intent.putExtra("client_cep", cliente.getCep());
+                intent.putExtra("client_image", imagem);
             }
             context.startActivity(intent);
         });
 
-        // DELETE ICON FUNCTIONALITY - COMMENTED OUT (delete icon removed from layout)
-        /*
-        if (holder.deleteIcon != null && deleteListener != null) {
-            holder.deleteIcon.setOnClickListener(v -> {
-                int currentPosition = holder.getAdapterPosition();
-                if (currentPosition != RecyclerView.NO_POSITION) {
-                    deleteListener.onDeleteClick(currentPosition, oportunidade);
-                }
-            });
-        }
-        */
     }
 
     @Override

@@ -9,8 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import com.bumptech.glide.Glide;
 import com.example.commercial_monitoring_app.R;
 import com.example.commercial_monitoring_app.model.Oportunidade;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class OportunidadeDetailActivity extends AppCompatActivity {
 
@@ -22,26 +26,12 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_oportunidade_detail);
 
-        // Setup toolbar with back button
-        //Toolbar toolbar = findViewById(R.id.toolbar);
-       // setSupportActionBar(toolbar);
-//        if (getSupportActionBar() != null) {
-//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//            getSupportActionBar().setDisplayShowHomeEnabled(true);
-//        }
-
-        TextView title = findViewById(R.id.detailTitle);
-        TextView status = findViewById(R.id.detailStatus);
-        TextView etapa = findViewById(R.id.detailEtapa);
-        TextView origem = findViewById(R.id.detailOrigem);
-        TextView momento = findViewById(R.id.detailMomento);
-        TextView razao = findViewById(R.id.detailRazao);
         Button toggleButton = findViewById(R.id.toggleAccordionButton);
         LinearLayout accordionContent = findViewById(R.id.accordionContent);
 
         // Opportunity data
         String oportunidadeName = getIntent().getStringExtra(EXTRA_OPORTUNIDADE_NAME);
-        title.setText(oportunidadeName != null ? oportunidadeName : "Detalhes da Oportunidade");
+        //title.setText(oportunidadeName != null ? oportunidadeName : "Detalhes da Oportunidade");
 
         // Client data
         String clientNome = getIntent().getStringExtra("client_nome");
@@ -59,13 +49,35 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         TextView clientAddressView = findViewById(R.id.clientAddress);
         TextView clientDocView = findViewById(R.id.clientDocuments);
 
+        TextView clientProfileName = findViewById(R.id.profile_name);
+        TextView clientProfileMail = findViewById(R.id.profile_email);
+        TextView clientProfilePhone = findViewById(R.id.profile_phone);
+        CircleImageView clientProfileImage = findViewById(R.id.profile_image);
+
+        String imagemUrl = getIntent().getStringExtra("client_image");
+        if (imagemUrl != null && !imagemUrl.isEmpty()) {
+
+            Glide.with(this)
+                    .load(imagemUrl)
+                    .placeholder(R.drawable.profile)
+                    .error(R.drawable.profile)
+                    .into(clientProfileImage);
+        }
+
         if (clientNome != null) {
             clientNameView.setText(clientNome);
+            clientProfileName.setText(clientNome);
         }
 
         StringBuilder contactInfo = new StringBuilder();
-        if (clientTelefone != null) contactInfo.append("Telefone: ").append(clientTelefone).append("\n");
-        if (clientEmail != null) contactInfo.append("Email: ").append(clientEmail);
+        if (clientTelefone != null) {
+            contactInfo.append("Telefone: ").append(clientTelefone).append("\n");
+            clientProfilePhone.setText(clientTelefone);
+        }
+        if (clientEmail != null){
+            contactInfo.append("Email: ").append(clientEmail);
+            clientProfileMail.setText(clientEmail);
+        }
         clientContactView.setText(contactInfo.toString());
 
         StringBuilder addressInfo = new StringBuilder();
