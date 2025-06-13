@@ -327,6 +327,37 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/assignment_icon"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:src="@drawable/assignment"
+                android:backgroundTint="@color/colorDetailInfo"
+                android:padding="16dp"
+                app:tint="@color/black"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Virar responsável pela oportunidade"
+                android:onClick="assignClient" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="Responsável"
+                android:textSize="12sp"
+                android:textColor="#666"
+                android:gravity="center" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </RelativeLayout>

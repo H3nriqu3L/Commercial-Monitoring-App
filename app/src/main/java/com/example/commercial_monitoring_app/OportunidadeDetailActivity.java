@@ -1,5 +1,6 @@
 package com.example.commercial_monitoring_app;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
@@ -112,7 +113,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             extraDetail2.setText(oportunidadeCurso != null ? "Curso: " + oportunidadeCurso : "Curso: Curso não informado");
 
             // Define extraDetail3 com oportunidadeContactado
-            extraDetail3.setText(oportunidadeContactado != null ? "Contatado?: " + oportunidadeContactado : "Sem informações de contato");
+            extraDetail3.setText(oportunidadeContactado != null ? "Contactado? " + oportunidadeContactado : "Sem informações de contato");
 
             extraDetail4.setText(oportunidadeResponsavel != null ? "Responsável: " + oportunidadeResponsavel : "Sem responsável");
 
@@ -207,5 +208,24 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Email do cliente não disponível", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void assignClient(View view){
+        String clientNome = getIntent().getStringExtra("client_nome");
+
+        new AlertDialog.Builder(OportunidadeDetailActivity.this)
+                .setTitle("Tornar-se Responsável")
+                .setMessage("Deseja realmente se tornar responsável da oportunidade de " + clientNome + "?")
+                .setPositiveButton("Confirmar", (dialog, which) -> performClientAssignment())
+                .setNegativeButton("Cancelar", null)
+                .show();
+
+    }
+
+    private void performClientAssignment(){
+        //TODO: Implementar mudanca de responsável da oportunidade
+        // So pode virar responsável se nao houver responsável para aquela oportunidade, responsavel==Null
+        // EXTRA_OPORTUNIDADE_ID = ID oportunidade...
+
     }
 }
