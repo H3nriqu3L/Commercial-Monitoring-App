@@ -4,6 +4,7 @@ import static com.example.commercial_monitoring_app.MyApp.getPersonalDataList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -48,6 +50,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         TextView title;
         TextView subtitle;
         TextView etapaStatus;
+        TextView responsavelName;
         // ImageView deleteIcon; // Commented out - delete icon removed from layout
 
         public OportunidadeViewHolder(View itemView) {
@@ -55,6 +58,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             title = itemView.findViewById(R.id.oportunidadeTitle);
             subtitle = itemView.findViewById(R.id.oportunidadeSubtitle);
             etapaStatus = itemView.findViewById(R.id.oportunidadeEtapaStatus);
+            responsavelName = itemView.findViewById(R.id.responsavelCard);
             // deleteIcon = itemView.findViewById(R.id.deleteOportunidadeIcon); // Commented out - ID doesn't exist
         }
     }
@@ -70,15 +74,83 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         Oportunidade oportunidade = oportunidades.get(position);
 
         Client cliente = MyApp.getClientList().stream().filter(c -> String.valueOf(c.getId()).equals(oportunidade.getPessoa())).findFirst().orElse(null);
-        String responsavel = "Sem responsável";
 
+        String etapaNome = oportunidade.getEtapaNome();
+        String responsavelNome = "Sem Responsável";
 
+        if(oportunidade.getResponsavelNome()!=null){
+            responsavelNome = oportunidade.getResponsavelNome();
+        }
 
 
 
         holder.title.setText(oportunidade.getPessoaNome());
-        holder.subtitle.setText("Agendamento: " + oportunidade.getAgendamentoNome() + " | Responsável: " + responsavel);
-        holder.etapaStatus.setText("Etapa: " + oportunidade.getEtapaNome() );
+
+        holder.etapaStatus.setText("Etapa: " + etapaNome);
+        holder.responsavelName.setText(responsavelNome);
+
+
+        // Define a cor do texto baseado na etapa
+        switch (etapaNome) {
+            case "Potencial":
+                // Azul claro mais escuro - Interesse Inicial
+                holder.etapaStatus.setTextColor(Color.parseColor("#7CBCE4"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Interessado":
+                // Azul médio - Usuário Curioso
+                holder.etapaStatus.setTextColor(Color.parseColor("#5DA9D4"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Inscrito parcial":
+                // Azul-esverdeado - Usuário Engajado
+                holder.etapaStatus.setTextColor(Color.parseColor("#76C1D4"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Inscrito":
+                // Verde-água - Usuário Recorrente
+                holder.etapaStatus.setTextColor(Color.parseColor("#4FB8A8"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Convocado":
+                // Verde médio - Usuário Qualificado
+                holder.etapaStatus.setTextColor(Color.parseColor("#3DAA76"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Confirmado":
+                // Verde intenso - Usuário Quase Confirmado
+                holder.etapaStatus.setTextColor(Color.parseColor("#2E8B57"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+            case "Matriculado":
+                // Verde escuro - Usuário Confirmado
+                holder.etapaStatus.setTextColor(Color.parseColor("#1E6439"));
+                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                break;
+
+
+
+
+            case "Alunos Regulares":
+                // Verde - status ativo e positivo
+                holder.etapaStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_green_dark));
+                holder.subtitle.setText(oportunidade.getRazaoOportunidadeNome());
+                break;
+            case "Em Alerta":
+                // Vermelho - requer atenção imediata
+                holder.etapaStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_red_dark));
+                holder.subtitle.setText(oportunidade.getRazaoOportunidadeNome());
+                break;
+            case "Evadidos":
+                //
+                holder.etapaStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.holo_orange_light));
+                holder.subtitle.setText(oportunidade.getRazaoOportunidadeNome());
+                break;
+            default:
+                // Cor padrão
+                holder.etapaStatus.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.primary_text_light));
+                break;
+        }
 
 
 
@@ -106,11 +178,10 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             Context context = v.getContext();
             Intent intent = new Intent(context, OportunidadeDetailActivity.class);
             intent.putExtra(OportunidadeDetailActivity.EXTRA_OPORTUNIDADE_NAME, oportunidade.getPessoaNome());
-            intent.putExtra("oportunidade_status", oportunidade.getStatusNome());
+            intent.putExtra("oportunidade_responsavel", oportunidade.getResponsavelNome());
+            intent.putExtra("oportunidade_curso", oportunidade.getCursoNome());
+            intent.putExtra("oportunidade_contactado", oportunidade.getRazaoOportunidadeNome());
             intent.putExtra("oportunidade_etapa", oportunidade.getEtapaNome());
-            intent.putExtra("oportunidade_origem", oportunidade.getOrigemNome());
-            intent.putExtra("oportunidade_momento", oportunidade.getMomento());
-            intent.putExtra("oportunidade_razao", oportunidade.getRazaoOportunidadeNome());
             if (cliente != null) {
                 intent.putExtra("client_nome", cliente.getName());
                 intent.putExtra("client_email", cliente.getEmail());

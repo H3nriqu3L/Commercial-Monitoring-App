@@ -4,16 +4,26 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
 import com.example.commercial_monitoring_app.model.Client;
+import com.example.commercial_monitoring_app.model.Oportunidade;
+import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.ResponseWrapper;
+import com.example.commercial_monitoring_app.network.RetrofitClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class SplashActivity extends AppCompatActivity {
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -59,12 +69,16 @@ public class SplashActivity extends AppCompatActivity {
         // Make the clientList Global
         MyApp.setClientList(clients);
 
+        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+        MyApp.fetchOportunidadesFromApi(null, apiService);
+        MyApp.fetchClientesFromApi(apiService);
+        MyApp.fetchPersonalDataFromApi(apiService);
 
         // Simulated loading time
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(200);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 }

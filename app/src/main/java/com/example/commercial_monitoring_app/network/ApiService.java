@@ -42,4 +42,16 @@ public interface ApiService {
     })
     @POST("api/Contato/dadosPessoas")
     Call<PersonalDataResponse> searchPersonalData();
+
+
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @FormUrlEncoded
+    @POST("api/Contato/listarOportunidades")
+    Call<ResponseWrapper<Oportunidade>> listarOportunidadesContato(
+            @Field("origem") String origem,
+            @Field("id") String id
+    );
 }

@@ -22,9 +22,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.commercial_monitoring_app.adapter.OportunidadesAdapter;
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
 import com.example.commercial_monitoring_app.model.Oportunidade;
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OportunidadesFragment extends Fragment {
 
@@ -35,6 +40,8 @@ public class OportunidadesFragment extends Fragment {
     private String currentFilter = "all";
     private String currentSearchQuery = "";
     private SearchView searchView;
+    private TabLayout tabLayout;
+    private String currentTab = "captacao"; // "captacao" ou "acompanhamento"
 
     public OportunidadesFragment() {}
 
@@ -49,11 +56,14 @@ public class OportunidadesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerView = view.findViewById(R.id.oportunidadesRecyclerView); // use correct ID
+        recyclerView = view.findViewById(R.id.oportunidadesRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         ImageView filterIcon = view.findViewById(R.id.filterIcon);
         filterIcon.setOnClickListener(v -> showFilterMenu(v));
 
+        // Setup TabLayout
+        tabLayout = view.findViewById(R.id.tabLayout);
+        setupTabLayout();
 
         oportunidadesList = MyApp.getOportunidadeList();
         if (oportunidadesList == null) {
@@ -66,9 +76,6 @@ public class OportunidadesFragment extends Fragment {
 
         oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades);
 
-
-
-
         recyclerView.setAdapter(oportunidadesAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
@@ -79,6 +86,39 @@ public class OportunidadesFragment extends Fragment {
         } else {
             Log.e("OportunidadesFragment", "SearchView not found in layout");
         }
+
+        // Apply initial filter
+        applyFiltersAndSearch();
+    }
+
+    private void setupTabLayout() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                int position = tab.getPosition();
+                switch (position) {
+                    case 0: // Captação
+                        currentTab = "captacao";
+                        break;
+                    case 1: // Acompanhamento
+                        currentTab = "acompanhamento";
+                        break;
+                }
+                // Reset filter when changing tabs
+                currentFilter = "all";
+                applyFiltersAndSearch();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Não precisa fazer nada
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // Não precisa fazer nada
+            }
+        });
     }
 
     private void setupSearchView() {
@@ -108,27 +148,61 @@ public class OportunidadesFragment extends Fragment {
 
     private void showFilterMenu(View view) {
         PopupMenu popup = new PopupMenu(getContext(), view);
-        popup.getMenuInflater().inflate(R.menu.filter_menu, popup.getMenu());
+
+        // Infla o menu correto baseado na tab atual
+        if (currentTab.equals("acompanhamento")) {
+            popup.getMenuInflater().inflate(R.menu.filter_menu, popup.getMenu());
+        } else {
+            popup.getMenuInflater().inflate(R.menu.filter_menu_captacao, popup.getMenu());
+        }
 
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.filter_all) {
 
+            if (itemId == R.id.filter_all) {
                 applyFilter("all");
                 return true;
-            } else if (itemId == R.id.filter_alerta) {
-
-                applyFilter("alerta");
-                return true;
-            } else if (itemId == R.id.filter_evadidos) {
-
-                applyFilter("evadidos");
-                return true;
-            } else if (itemId == R.id.filter_regulares  ) {
-
-                applyFilter("regulares");
-                return true;
             }
+
+            // Filtros para Acompanhamento
+            if (currentTab.equals("acompanhamento")) {
+                if (itemId == R.id.filter_alerta) {
+                    applyFilter("alerta");
+                    return true;
+                } else if (itemId == R.id.filter_evadidos) {
+                    applyFilter("evadidos");
+                    return true;
+                } else if (itemId == R.id.filter_regulares) {
+                    applyFilter("regulares");
+                    return true;
+                }
+            }
+            // Filtros para Captação
+            else {
+                if (itemId == R.id.filter_potencial) {
+                    applyFilter("potencial");
+                    return true;
+                } else if (itemId == R.id.filter_interessado) {
+                    applyFilter("interessado");
+                    return true;
+                } else if (itemId == R.id.filter_inscrito_parcial) {
+                    applyFilter("inscrito_parcial");
+                    return true;
+                } else if (itemId == R.id.filter_inscrito) {
+                    applyFilter("inscrito");
+                    return true;
+                } else if (itemId == R.id.filter_confirmado) {
+                    applyFilter("confirmado");
+                    return true;
+                } else if (itemId == R.id.filter_convocado) {
+                    applyFilter("convocado");
+                    return true;
+                } else if (itemId == R.id.filter_matriculado) {
+                    applyFilter("matriculado");
+                    return true;
+                }
+            }
+
             return false;
         });
 
@@ -138,38 +212,83 @@ public class OportunidadesFragment extends Fragment {
     private void applyFiltersAndSearch() {
         List<Oportunidade> newFilteredList = new ArrayList<>();
 
-        // First apply the filter
-        switch (currentFilter) {
-            case "all":
-                newFilteredList.addAll(oportunidadesList);
-                break;
-
-            case "alerta":
-                for (Oportunidade oportunidade : oportunidadesList) {
-                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Em Alerta")) {
-                        newFilteredList.add(oportunidade);
-                    }
-                }
-                break;
-
-            case "evadidos":
-                for (Oportunidade oportunidade : oportunidadesList) {
-                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Evadidos")) {
-                        newFilteredList.add(oportunidade);
-                    }
-                }
-                break;
-
-            case "regulares":
-                for (Oportunidade oportunidade : oportunidadesList) {
-                    if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Alunos Regulares")) {
-                        newFilteredList.add(oportunidade);
-                    }
-                }
-                break;
+        // Primeiro aplica o filtro da tab
+        for (Oportunidade oportunidade : oportunidadesList) {
+            if (shouldShowInCurrentTab(oportunidade)) {
+                newFilteredList.add(oportunidade);
+            }
         }
 
-        // After applying search filter
+        // Depois aplica o filtro específico
+        if (!currentFilter.equals("all")) {
+            List<Oportunidade> specificFilteredList = new ArrayList<>();
+
+            for (Oportunidade oportunidade : newFilteredList) {
+                if (currentTab.equals("acompanhamento")) {
+                    // Filtros para Acompanhamento
+                    switch (currentFilter) {
+                        case "alerta":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Em Alerta")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "evadidos":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Evadidos")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "regulares":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Alunos Regulares")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                    }
+                } else {
+                    // Filtros para Captação
+                    switch (currentFilter) {
+                        case "potencial":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Potencial")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "interessado":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Interessado")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "inscrito_parcial":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Inscrito parcial")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "inscrito":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Inscrito")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "confirmado":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Confirmado")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "convocado":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Convocado")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                        case "matriculado":
+                            if (oportunidade.getEtapaNome() != null && oportunidade.getEtapaNome().equals("Matriculado")) {
+                                specificFilteredList.add(oportunidade);
+                            }
+                            break;
+                    }
+                }
+            }
+            newFilteredList = specificFilteredList;
+
+        }
+
+        // Por último aplica o filtro de busca
         if (!currentSearchQuery.isEmpty()) {
             List<Oportunidade> searchFilteredList = new ArrayList<>();
             String searchLower = currentSearchQuery.toLowerCase().trim();
@@ -183,7 +302,33 @@ public class OportunidadesFragment extends Fragment {
             newFilteredList = searchFilteredList;
         }
 
+
+        if (currentTab.equals("captacao")) {
+            newFilteredList = sortCaptacaoList(newFilteredList);
+        } else if (currentTab.equals("acompanhamento")) {
+            newFilteredList = sortAcompanhamentoList(newFilteredList);
+        }
+
+
         oportunidadesAdapter.updateData(newFilteredList);
+    }
+
+    private boolean shouldShowInCurrentTab(Oportunidade oportunidade) {
+        String etapaNome = oportunidade.getEtapaNome();
+
+        if (currentTab.equals("acompanhamento")) {
+            // Tab Acompanhamento: mostrar apenas "Evadidos", "Em Alerta" ou "Alunos Regulares"
+            return etapaNome != null &&
+                    (etapaNome.equals("Evadidos") ||
+                            etapaNome.equals("Em Alerta") ||
+                            etapaNome.equals("Alunos Regulares"));
+        } else {
+            // Tab Captação: mostrar qualquer coisa que NÃO seja "Evadidos", "Em Alerta" ou "Alunos Regulares"
+            return etapaNome == null ||
+                    (!etapaNome.equals("Evadidos") &&
+                            !etapaNome.equals("Em Alerta") &&
+                            !etapaNome.equals("Alunos Regulares"));
+        }
     }
 
     private void applyFilter(String filterType) {
@@ -224,15 +369,94 @@ public class OportunidadesFragment extends Fragment {
         }
     }
 
+    private List<Oportunidade> sortCaptacaoList(List<Oportunidade> oportunidades) {
+        // Definindo a ordem de prioridade das etapas
+        Map<String, Integer> etapaOrder = new HashMap<>();
+        etapaOrder.put("Potencial", 1);
+        etapaOrder.put("Interessado", 2);
+        etapaOrder.put("Inscrito parcial", 3);
+        etapaOrder.put("Inscrito", 4);
+        etapaOrder.put("Confirmado", 5);
+        etapaOrder.put("Convocado", 6);
+        etapaOrder.put("Matriculado", 7);
+
+        // Criando uma nova lista para não modificar a original
+        List<Oportunidade> sortedList = new ArrayList<>(oportunidades);
+
+
+        Collections.sort(sortedList, new Comparator<Oportunidade>() {
+            @Override
+            public int compare(Oportunidade o1, Oportunidade o2) {
+                String etapa1 = o1.getEtapaNome();
+                String etapa2 = o2.getEtapaNome();
+
+
+                if (etapa1 == null && etapa2 == null) return 0;
+                if (etapa1 == null) return 1;
+                if (etapa2 == null) return -1;
+
+
+                Integer order1 = etapaOrder.get(etapa1);
+                Integer order2 = etapaOrder.get(etapa2);
+
+
+                if (order1 == null && order2 == null) return 0;
+                if (order1 == null) return 1;
+                if (order2 == null) return -1;
+
+
+                return Integer.compare(order1, order2);
+            }
+        });
+
+        return sortedList;
+    }
+
+    private List<Oportunidade> sortAcompanhamentoList(List<Oportunidade> oportunidades) {
+        // Definindo a ordem de prioridade das etapas para acompanhamento
+        Map<String, Integer> etapaOrder = new HashMap<>();
+        etapaOrder.put("Em Alerta", 1);
+        etapaOrder.put("Evadidos", 2);
+        etapaOrder.put("Alunos Regulares", 3);
+
+        List<Oportunidade> sortedList = new ArrayList<>(oportunidades);
+
+        // Ordenando a lista baseada na ordem das etapas
+        Collections.sort(sortedList, new Comparator<Oportunidade>() {
+            @Override
+            public int compare(Oportunidade o1, Oportunidade o2) {
+                String etapa1 = o1.getEtapaNome();
+                String etapa2 = o2.getEtapaNome();
+
+                if (etapa1 == null && etapa2 == null) return 0;
+                if (etapa1 == null) return 1;
+                if (etapa2 == null) return -1;
+
+
+                Integer order1 = etapaOrder.get(etapa1);
+                Integer order2 = etapaOrder.get(etapa2);
+
+
+                if (order1 == null && order2 == null) return 0;
+                if (order1 == null) return 1;
+                if (order2 == null) return -1;
+
+
+                return Integer.compare(order1, order2);
+            }
+        });
+
+        return sortedList;
+    }
 
     public void refreshOportunidadesList() {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                List<Oportunidade> updatedList = MyApp.getOportunidadeList();
-                Log.d("OportunidadesFragment", "Atualizando lista com " + updatedList.size() + " oportunidades");
+                oportunidadesList = MyApp.getOportunidadeList();
+                Log.d("OportunidadesFragment", "Atualizando lista com " + oportunidadesList.size() + " oportunidades");
 
-                oportunidadesAdapter = new OportunidadesAdapter(updatedList); // Changed to single parameter
-                recyclerView.setAdapter(oportunidadesAdapter);
+                // Reaplica todos os filtros
+                applyFiltersAndSearch();
 
                 Log.d("OportunidadesFragment", "Adapter atualizado");
             });
@@ -242,12 +466,11 @@ public class OportunidadesFragment extends Fragment {
     public void refreshOportunidades() {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                List<Oportunidade> updatedList = MyApp.getOportunidadeList();
-                Log.d("OportunidadesFragment", "Atualizando lista com " + updatedList.size() + " oportunidades");
+                oportunidadesList = MyApp.getOportunidadeList();
+                Log.d("OportunidadesFragment", "Atualizando lista com " + oportunidadesList.size() + " oportunidades");
 
-                if (oportunidadesAdapter != null) {
-                    oportunidadesAdapter.updateData(updatedList);
-                }
+                // Reaplica todos os filtros
+                applyFiltersAndSearch();
 
                 Log.d("OportunidadesFragment", "Adapter atualizado");
             });

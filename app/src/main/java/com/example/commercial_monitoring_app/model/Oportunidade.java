@@ -16,6 +16,10 @@ public class Oportunidade {
     private String razaoOportunidadeNome;
     private String agendamentoNome;
     private String dias;
+
+    private String responsavelNome;
+
+    private String cursoNome;
     private CamposPersonalizados camposPersonalizados;
 
     // Getters
@@ -26,6 +30,8 @@ public class Oportunidade {
     public String getStatus() {
         return status;
     }
+
+    public String  getResponsavelNome(){return responsavelNome;}
 
     public String getOrigem() {
         return origem;
@@ -46,6 +52,8 @@ public class Oportunidade {
     public String getMomento() {
         return momento;
     }
+
+    public String getCursoNome(){return cursoNome;}
 
     public String getUltimaAlteracaoEtapa() {
         return ultimaAlteracaoEtapa;

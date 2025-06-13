@@ -39,20 +39,28 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         String clientTelefone = getIntent().getStringExtra("client_telefone");
         String clientCpf = getIntent().getStringExtra("client_cpf");
         String clientNascimento = getIntent().getStringExtra("client_nascimento");
-        String clientEndereco = getIntent().getStringExtra("client_endereco");
-        String clientBairro = getIntent().getStringExtra("client_bairro");
-        String clientCep = getIntent().getStringExtra("client_cep");
 
-        // Set client info in the accordion
+        //Oportunidade data
+        String oportunidadeResponsavel = getIntent().getStringExtra("oportunidade_responsavel");
+        String oportunidadeCurso = getIntent().getStringExtra("oportunidade_curso");
+        String oportunidadeContactado = getIntent().getStringExtra("oportunidade_contactado");
+        String oportunidadeEtapa = getIntent().getStringExtra("oportunidade_etapa");
+
+        //TextViews
         TextView clientNameView = findViewById(R.id.clientName);
         TextView clientContactView = findViewById(R.id.clientContact);
-        TextView clientAddressView = findViewById(R.id.clientAddress);
         TextView clientDocView = findViewById(R.id.clientDocuments);
-
         TextView clientProfileName = findViewById(R.id.profile_name);
         TextView clientProfileMail = findViewById(R.id.profile_email);
         TextView clientProfilePhone = findViewById(R.id.profile_phone);
         CircleImageView clientProfileImage = findViewById(R.id.profile_image);
+
+        TextView extraDetail1 = findViewById(R.id.extraDetail1);
+        TextView extraDetail2 = findViewById(R.id.extraDetail2);
+        TextView extraDetail3 = findViewById(R.id.extraDetail3);
+        TextView extraDetail4 = findViewById(R.id.extraDetail4);
+
+
 
         String imagemUrl = getIntent().getStringExtra("client_image");
         if (imagemUrl != null && !imagemUrl.isEmpty()) {
@@ -80,16 +88,37 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         }
         clientContactView.setText(contactInfo.toString());
 
-        StringBuilder addressInfo = new StringBuilder();
-        if (clientEndereco != null) addressInfo.append("Endereço: ").append(clientEndereco).append("\n");
-        if (clientBairro != null) addressInfo.append("Bairro: ").append(clientBairro).append("\n");
-        if (clientCep != null) addressInfo.append("CEP: ").append(clientCep);
-        clientAddressView.setText(addressInfo.toString());
-
         StringBuilder docInfo = new StringBuilder();
         if (clientCpf != null) docInfo.append("CPF: ").append(clientCpf).append("\n");
         if (clientNascimento != null) docInfo.append("Nascimento: ").append(clientNascimento);
         clientDocView.setText(docInfo.toString());
+
+
+        // Lógica para mostrar detalhes extras
+        if (oportunidadeEtapa != null &&
+                !oportunidadeEtapa.equals("Em Alerta") &&
+                !oportunidadeEtapa.equals("Evadido") &&
+                !oportunidadeEtapa.equals("Alunos Regulares")) {
+
+            // Define extraDetail1 com oportunidadeEtapa
+            extraDetail1.setText(oportunidadeEtapa != null ? "Etapa: " + oportunidadeEtapa : "Etapa: Sem Etapa Definida");
+
+            // Define extraDetail2 com oportunidadeCurso
+            extraDetail2.setText(oportunidadeCurso != null ? "Curso: " + oportunidadeCurso : "Curso: Curso não informado");
+
+            // Define extraDetail3 com oportunidadeContactado
+            extraDetail3.setText(oportunidadeContactado != null ? "Contatado?: " + oportunidadeContactado : "Sem informações de contato");
+
+            extraDetail4.setText(oportunidadeResponsavel != null ? "Responsável: " + oportunidadeResponsavel : "Sem responsável");
+
+        } else {
+            extraDetail1.setText(oportunidadeEtapa != null ? "Etapa: " + oportunidadeEtapa : "Etapa: Sem Etapa Definida");
+
+            extraDetail2.setText(oportunidadeContactado != null ? "Contatado?: " + oportunidadeContactado : "Sem informações de contato");
+
+            extraDetail3.setText(oportunidadeResponsavel != null ? "Responsável: " + oportunidadeResponsavel : "Sem responsável");
+            extraDetail4.setText("");
+        }
 
         // Toggle button functionality
         toggleButton.setOnClickListener(v -> {

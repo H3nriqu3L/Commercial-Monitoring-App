@@ -33,12 +33,11 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         MyApp.context = getApplicationContext();
-        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+        //apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
-        // Make API calls sequentially or handle them properly
-        fetchOportunidadesFromApi(null);
-        fetchClientesFromApi();
-        fetchPersonalDataFromApi();
+        // Make API (MOVED TO SPlASH SCREEN)
+
+
     }
 
     public static Context getAppContext() {
@@ -69,7 +68,7 @@ public class MyApp extends Application {
         personalDataList = list != null ? list : new ArrayList<>();
     }
 
-    public static void fetchOportunidadesFromApi(Callback<ResponseWrapper<Oportunidade>> callback) {
+    public static void fetchOportunidadesFromApi(Callback<ResponseWrapper<Oportunidade>> callback, ApiService apiService) {
         Call<ResponseWrapper<Oportunidade>> call = apiService.listarOportunidades();
 
         call.enqueue(new Callback<ResponseWrapper<Oportunidade>>() {
@@ -102,43 +101,43 @@ public class MyApp extends Application {
     }
 
     public static void excluirOportunidadeEAtualizarLista(int oportunidadeId, OnOportunidadeDeletedListener listener) {
-        Call<Void> call = apiService.excluirOportunidade(oportunidadeId);
-
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
-                    showToast("Oportunidade excluída com sucesso");
-                    // Fetch updated list and then notify
-                    fetchOportunidadesFromApi(new Callback<ResponseWrapper<Oportunidade>>() {
-                        @Override
-                        public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
-                            if (listener != null) {
-                                listener.onOportunidadeDeleted();
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
-                            if (listener != null) {
-                                listener.onOportunidadeDeleted();
-                            }
-                        }
-                    });
-                } else {
-                    logAndShowError("Erro ao excluir: " + response.code(), response);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("API_FAILURE", "Erro ao excluir oportunidade: ", t);
-                showToast("Erro de rede ao excluir: " + t.getMessage());
-            }
-        });
+//        Call<Void> call = apiService.excluirOportunidade(oportunidadeId);
+//
+//        call.enqueue(new Callback<Void>() {
+//            @Override
+//            public void onResponse(Call<Void> call, Response<Void> response) {
+//                if (response.isSuccessful()) {
+//                    showToast("Oportunidade excluída com sucesso");
+//                    // Fetch updated list and then notify
+//                    fetchOportunidadesFromApi(new Callback<ResponseWrapper<Oportunidade>>() {
+//                        @Override
+//                        public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
+//                            if (listener != null) {
+//                                listener.onOportunidadeDeleted();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+//                            if (listener != null) {
+//                                listener.onOportunidadeDeleted();
+//                            }
+//                        }
+//                    });
+//                } else {
+//                    logAndShowError("Erro ao excluir: " + response.code(), response);
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Void> call, Throwable t) {
+//                Log.e("API_FAILURE", "Erro ao excluir oportunidade: ", t);
+//                showToast("Erro de rede ao excluir: " + t.getMessage());
+//            }
+//        });
     }
 
-    private void fetchClientesFromApi() {
+    public static void fetchClientesFromApi( ApiService apiService) {
         Call<ResponseWrapper<Client>> call = apiService.listarPessoas();
 
         call.enqueue(new Callback<ResponseWrapper<Client>>() {
@@ -160,7 +159,7 @@ public class MyApp extends Application {
         });
     }
 
-    private void fetchPersonalDataFromApi() {
+    public static void fetchPersonalDataFromApi(ApiService apiService) {
         Call<PersonalDataResponse> call = apiService.searchPersonalData();
 
         call.enqueue(new Callback<PersonalDataResponse>() {

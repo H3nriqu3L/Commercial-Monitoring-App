@@ -31,19 +31,38 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/oportunidadeSubtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Origem e Agendamento"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/oportunidadeEtapaStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Etapa e Status"
+                android:layout_marginTop="8dp"
+                android:text="Etapa"
                 android:textSize="14sp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/oportunidadeSubtitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sem agendamento"
+                    android:textSize="14sp"
+                    android:textAlignment="textStart" />
+
+                <TextView
+                    android:id="@+id/responsavelCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Responsável: Usuario"
+                    android:textSize="14sp"
+                    android:textAlignment="textEnd" />
+            </LinearLayout>
+
 
         </LinearLayout>
     </RelativeLayout>

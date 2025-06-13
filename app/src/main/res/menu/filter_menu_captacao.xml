@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/filter_all"
+        android:title="Todos" />
+    <item android:id="@+id/filter_potencial"
+        android:title="Potencial" />
+    <item android:id="@+id/filter_interessado"
+        android:title="Interessado" />
+    <item android:id="@+id/filter_inscrito_parcial"
+        android:title="Inscrito Parcial" />
+    <item android:id="@+id/filter_inscrito"
+        android:title="Inscrito" />
+    <item android:id="@+id/filter_confirmado"
+        android:title="Confirmado" />
+    <item android:id="@+id/filter_convocado"
+        android:title="Convocado" />
+    <item android:id="@+id/filter_matriculado"
+        android:title="Matriculado" />
+</menu>

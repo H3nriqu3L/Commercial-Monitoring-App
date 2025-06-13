@@ -190,14 +190,6 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
-                        android:id="@+id/clientAddress"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="14sp"
-                        android:textColor="#444"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
                         android:id="@+id/clientDocuments"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -245,6 +237,15 @@
                         android:layout_height="wrap_content"
                         android:text="Descrição: "
                         android:textSize="14sp"
+                        android:textColor="#444"
+                        android:layout_marginBottom="6dp"/>
+
+                    <TextView
+                        android:id="@+id/extraDetail4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Detalhe Extra 4: "
+                        android:textSize="14sp"
                         android:textColor="#444" />
                 </LinearLayout>
 
@@ -262,7 +263,7 @@
         android:background="@android:color/white"
         android:elevation="8dp"
         android:gravity="center"
-        android:padding="16dp">
+        android:padding="2dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -278,7 +279,7 @@
                 android:src="@drawable/phone"
                 android:backgroundTint="@color/colorDetailInfo"
                 android:padding="16dp"
-                android:tint="@color/black"
+                app:tint="@color/black"
                 android:clickable="true"
                 android:focusable="true"
                 android:contentDescription="Ligar para cliente"
@@ -287,7 +288,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="0dp"
                 android:text="Ligar"
                 android:textSize="12sp"
                 android:textColor="#666"
@@ -309,7 +310,7 @@
                 android:src="@drawable/mail"
                 android:backgroundTint="@color/colorDetailInfo"
                 android:padding="16dp"
-                android:tint="@color/black"
+                app:tint="@color/black"
                 android:clickable="true"
                 android:focusable="true"
                 android:contentDescription="Enviar email para cliente"
@@ -318,7 +319,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="0dp"
                 android:text="Email"
                 android:textSize="12sp"
                 android:textColor="#666"
