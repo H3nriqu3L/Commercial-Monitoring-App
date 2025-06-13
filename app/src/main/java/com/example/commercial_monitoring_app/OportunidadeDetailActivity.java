@@ -1,11 +1,16 @@
 package com.example.commercial_monitoring_app;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -143,5 +148,64 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
     public void navigateBack(View view) {
         finish();
+    }
+
+    public void callClient(View view) {
+        String clientTelefone = getIntent().getStringExtra("client_telefone");
+
+        if (clientTelefone != null && !clientTelefone.trim().isEmpty()) {
+            // Remove espaços e caracteres especiais, mantendo apenas números
+            String phoneNumber = clientTelefone.replaceAll("[^0-9+]", "");
+
+            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+            callIntent.setData(Uri.parse("tel:" + phoneNumber));
+
+            try {
+                startActivity(callIntent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Não foi possível encontrar um aplicativo para fazer ligações", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Número de telefone não disponível", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void emailClient(View view) {
+        String clientEmail = getIntent().getStringExtra("client_email");
+        String clientNome = getIntent().getStringExtra("client_nome");
+        String oportunidadeName = getIntent().getStringExtra(EXTRA_OPORTUNIDADE_NAME);
+
+        if (clientEmail != null && !clientEmail.trim().isEmpty()) {
+
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            emailIntent.setData(Uri.parse("mailto:" + clientEmail));
+
+            String subject = "Contato - ";
+            if (oportunidadeName != null && !oportunidadeName.trim().isEmpty()) {
+                subject += oportunidadeName;
+            } else {
+                subject += "Oportunidade";
+            }
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+
+            String emailBody = "";
+            if (clientNome != null && !clientNome.trim().isEmpty()) {
+                emailBody = "Olá " + clientNome + ",\n\n";
+            } else {
+                emailBody = "Olá,\n\n";
+            }
+            emailBody += "Entrando em contato referente à sua oportunidade.\n\n";
+            emailBody += "Atenciosamente,\n[Seu nome]";
+
+            emailIntent.putExtra(Intent.EXTRA_TEXT, emailBody);
+
+            try {
+                startActivity(Intent.createChooser(emailIntent, "Enviar email"));
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(this, "Não foi possível encontrar um aplicativo de email", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Email do cliente não disponível", Toast.LENGTH_SHORT).show();
+        }
     }
 }
