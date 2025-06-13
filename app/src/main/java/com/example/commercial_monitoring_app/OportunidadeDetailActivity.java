@@ -222,9 +222,44 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
     }
 
+    public void setClientAsWon(View view){
+        String clientNome = getIntent().getStringExtra("client_nome");
+
+        new AlertDialog.Builder(OportunidadeDetailActivity.this)
+                .setTitle("Oportunidade Ganha")
+                .setMessage("Deseja realmente confirmar que a oportunidade de " + clientNome + " foi ganha?")
+                .setPositiveButton("Confirmar", (dialog, which) -> performClientWon())
+                .setNegativeButton("Cancelar", null)
+                .show();
+
+    }
+    public void setClientAsLost(View view){
+        String clientNome = getIntent().getStringExtra("client_nome");
+
+        new AlertDialog.Builder(OportunidadeDetailActivity.this)
+                .setTitle("Oportunidade Perdida")
+                .setMessage("Deseja realmente confirmar que a oportunidade de " + clientNome + " foi perdida?")
+                .setPositiveButton("Confirmar", (dialog, which) -> performClientLost())
+                .setNegativeButton("Cancelar", null)
+                .show();
+
+    }
+
     private void performClientAssignment(){
         //TODO: Implementar mudanca de responsável da oportunidade
         // So pode virar responsável se nao houver responsável para aquela oportunidade, responsavel==Null
+        // EXTRA_OPORTUNIDADE_ID = ID oportunidade...
+
+    }
+
+    private void performClientWon(){
+        //TODO: Performar mudanças na API marcando oportunidade como ganha
+        // EXTRA_OPORTUNIDADE_ID = ID oportunidade...
+
+    }
+
+    private void performClientLost(){
+        //TODO: Performar mudanças na API marcando oportunidade como ganha
         // EXTRA_OPORTUNIDADE_ID = ID oportunidade...
 
     }
