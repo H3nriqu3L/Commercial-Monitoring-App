@@ -17,12 +17,8 @@ public final class DatabaseHelper {
             "CREATE TABLE Client (idClient INTEGER PRIMARY KEY AUTOINCREMENT,"+
                     " name TEXT NOT NULL, email TEXT NOT NULL, phoneNumber TEXT,"+
                     " cpf TEXT NOT NULL, birthDate TEXT);",
-            "INSERT INTO Client (name, email, phoneNumber, cpf, birthDate) VALUES"+
-                    " ('João Silva', 'joao.silva@email.com', '37999123456', '12345678901', '1985-03-15');",
-            "INSERT INTO Client (name, email, phoneNumber, cpf, birthDate) VALUES"+
-                    " ('Maria Santos', 'maria.santos@email.com', '37988765432', '98765432109', '1990-07-22');",
-            "INSERT INTO Client (name, email, phoneNumber, cpf, birthDate) VALUES"+
-                    " ('Pedro Oliveira', 'pedro.oliveira@email.com', '37977654321', '11122233344', '1978-12-10');"
+            "CREATE TABLE User (id INTEGER PRIMARY KEY AUTOINCREMENT,"+
+                    " nome TEXT NOT NULL, email TEXT NOT NULL, imagem TEXT);",
     };
 
     private DatabaseHelper(){

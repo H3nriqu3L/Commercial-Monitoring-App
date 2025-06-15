@@ -53,41 +53,29 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        // data loading logic here
-        // - TODO  Load local datasets
-        // - TODO Initialize components
-        // - TODO Make initial API calls
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance();
 
-        Cursor cursor = dbHelper.search("Client", null, "", "name ASC");
-        List<Client> clients = new ArrayList<>();
+        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
-        while(cursor.moveToNext()){
-            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-            String email = cursor.getString(cursor.getColumnIndexOrThrow("email"));
-            String phoneNumber = cursor.getString(cursor.getColumnIndexOrThrow("phoneNumber"));
-            String cpf = cursor.getString(cursor.getColumnIndexOrThrow("cpf"));
-            String birthDate = cursor.getString(cursor.getColumnIndexOrThrow("birthDate"));
+        // Criar as 3 threads para as requisições
+        Thread t1 = new Thread(() -> MyApp.fetchOportunidadesFromApi(null, apiService));
+        Thread t2 = new Thread(() -> MyApp.fetchClientesFromApi(apiService));
+        Thread t3 = new Thread(() -> MyApp.fetchPersonalDataFromApi(apiService));
 
-            Client client = new Client(name, email, phoneNumber, cpf, birthDate);
-            clients.add(client);
+        // Iniciar as 3 threads
+        t1.start();
+        t2.start();
+        t3.start();
+
+        try {
+            // Aguardar todas terminarem
+            t1.join();
+            t2.join();
+            t3.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
-        cursor.close();
-
-        MyApp.setClientList(clients);
-
-        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
-        MyApp.fetchOportunidadesFromApi(null, apiService);
-        MyApp.fetchClientesFromApi(apiService);
-        MyApp.fetchPersonalDataFromApi(apiService);
-
-        // Simulated loading time
-//        try {
-//            Thread.sleep(200);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
 }
