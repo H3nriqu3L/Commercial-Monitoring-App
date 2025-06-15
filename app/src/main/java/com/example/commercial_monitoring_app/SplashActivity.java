@@ -34,7 +34,7 @@ public class SplashActivity extends AppCompatActivity {
             loadData();
 
             runOnUiThread(()->{
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             });
@@ -66,7 +66,6 @@ public class SplashActivity extends AppCompatActivity {
 
         cursor.close();
 
-        // Make the clientList Global
         MyApp.setClientList(clients);
 
         apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");

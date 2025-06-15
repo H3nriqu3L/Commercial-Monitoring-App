@@ -1,6 +1,8 @@
 package com.example.commercial_monitoring_app.adapter;
 
+import static android.content.Context.STATUS_BAR_SERVICE;
 import static com.example.commercial_monitoring_app.MyApp.getPersonalDataList;
+import static com.example.commercial_monitoring_app.OportunidadeDetailActivity.EXTRA_STATUS;
 
 import android.content.Context;
 import android.content.Intent;
@@ -178,11 +180,15 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             Context context = v.getContext();
             Intent intent = new Intent(context, OportunidadeDetailActivity.class);
             intent.putExtra(OportunidadeDetailActivity.EXTRA_OPORTUNIDADE_NAME, oportunidade.getPessoaNome());
+            intent.putExtra(OportunidadeDetailActivity.EXTRA_OPORTUNIDADE_ID, oportunidade.getId());
             intent.putExtra("oportunidade_responsavel", oportunidade.getResponsavelNome());
             intent.putExtra("oportunidade_curso", oportunidade.getCursoNome());
             intent.putExtra("oportunidade_contactado", oportunidade.getRazaoOportunidadeNome());
             intent.putExtra("oportunidade_etapa", oportunidade.getEtapaNome());
+            intent.putExtra(EXTRA_STATUS, oportunidade.getStatus());
+
             if (cliente != null) {
+                intent.putExtra("client_id", String.valueOf(cliente.getId()));
                 intent.putExtra("client_nome", cliente.getName());
                 intent.putExtra("client_email", cliente.getEmail());
                 intent.putExtra("client_telefone", cliente.getTelefone());

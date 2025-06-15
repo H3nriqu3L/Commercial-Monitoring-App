@@ -1,12 +1,17 @@
 package com.example.commercial_monitoring_app.network;
 
 import com.example.commercial_monitoring_app.model.Client;
+import com.example.commercial_monitoring_app.model.NavigationResponse;
 import com.example.commercial_monitoring_app.model.Oportunidade;
 import com.example.commercial_monitoring_app.model.PersonalData;
+import com.example.commercial_monitoring_app.model.Responsavel;
+
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -54,4 +59,81 @@ public interface ApiService {
             @Field("origem") String origem,
             @Field("id") String id
     );
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Oportunidade/alterarResponsavel")
+    Call<Void> alterarResponsavel(
+            @Field("id") int id,
+            @Field("responsavel") int responsavel,
+            @Field("responsavelNome") String responsavelNome,
+            @Field("indiceFilaRequisicao") int indiceFilaRequisicao
+    );
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Oportunidade/listarResponsavelAlteracao")
+    Call<ResponseWrapper2<Responsavel>> listarResponsavelAlteracao(
+            @Field("id") int oportunidadeId,
+            @Field("indiceFilaRequisicao") int indiceFilaRequisicao);
+
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @GET("api/Navegacao/Tela/6/2/")
+    Call<NavigationResponse> getNavigationData();
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Oportunidade/alterarStatus")
+    Call<Void> alterarStatusOportunidade(
+            @Field("id") int id,
+            @Field("origem") int origem,
+            @Field("status") int status,
+            @Field("statusCliente") int statusCliente,
+            @Field("indiceFilaRequisicao") int indiceFilaRequisicao
+    );
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Pessoa/dadosOportunidadeAtualizada")
+    Call<Void> atualizarDadosOportunidade(
+            @Field("oportunidade") int oportunidadeId,
+            @Field("pessoa") int pessoaId,
+            @Field("indiceFilaRequisicao") int indiceFilaRequisicao
+    );
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Oportunidade/alterarStatus")
+    Call<Void> alterarStatusOportunidadePerdida(
+            @Field("id") int id,
+            @Field("origem") int origem,
+            @Field("statusCliente") int statusCliente,
+            @Field("processo") int processo,
+            @Field("possuiConcorrente") int possuiConcorrente,
+            @Field("observacaoPerda") String observacaoPerda,
+            @Field("status") int status,
+            @Field("objecao") int objecao,
+            @Field("objecaoNome") String objecaoNome,
+            @Field("indiceFilaRequisicao") int indiceFilaRequisicao
+    );
+
+
 }

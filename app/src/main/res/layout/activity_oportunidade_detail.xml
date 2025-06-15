@@ -138,8 +138,16 @@
                                 android:drawablePadding="8dp"
                                 android:gravity="center_vertical" />
 
+                            <TextView
+                                android:id="@+id/status_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="Status: Ativo"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold"/>
                         </LinearLayout>
-
                     </LinearLayout>
                 </LinearLayout>
 
@@ -248,7 +256,6 @@
                         android:textSize="14sp"
                         android:textColor="#444" />
                 </LinearLayout>
-
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
@@ -293,7 +300,6 @@
                 android:textSize="10sp"
                 android:textColor="#666"
                 android:gravity="center" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -324,102 +330,169 @@
                 android:textSize="10sp"
                 android:textColor="#666"
                 android:gravity="center" />
-
         </LinearLayout>
 
+        <!-- Status-dependent Actions Container -->
         <LinearLayout
+            android:id="@+id/status_actions_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_weight="3"
+            android:orientation="horizontal">
 
-            <ImageView
-                android:id="@+id/assignment_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/assignment"
-                android:backgroundTint="@color/colorDetailInfo"
-                android:padding="8dp"
-                app:tint="@color/black"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Virar responsável pela oportunidade"
-                android:onClick="assignClient" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Default Status Actions (status = 1) -->
+            <LinearLayout
+                android:id="@+id/default_status_actions"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:text="Responsável"
-                android:textSize="10sp"
-                android:textColor="#666"
-                android:gravity="center" />
+                android:orientation="horizontal">
 
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
+                    <ImageView
+                        android:id="@+id/assignment_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/assignment"
+                        android:backgroundTint="@color/colorDetailInfo"
+                        android:padding="8dp"
+                        app:tint="@color/black"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Virar responsável pela oportunidade"
+                        android:onClick="assignClient" />
 
-            <ImageView
-                android:id="@+id/check_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/check"
-                android:backgroundTint="@color/colorDetailInfo"
-                android:padding="8dp"
-                app:tint="@color/black"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Oportunidade Ganha"
-                android:onClick="setClientAsWon" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:text="Responsável"
+                        android:textSize="10sp"
+                        android:textColor="#666"
+                        android:gravity="center" />
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/check_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/check"
+                        android:backgroundTint="@color/colorDetailInfo"
+                        android:padding="8dp"
+                        app:tint="@color/black"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Oportunidade Ganha"
+                        android:onClick="setClientAsWon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:text="Ganho"
+                        android:textSize="10sp"
+                        android:textColor="#666"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/close_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/close"
+                        android:backgroundTint="@color/colorDetailInfo"
+                        android:padding="8dp"
+                        app:tint="@color/black"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Oportunidade Perdida"
+                        android:onClick="setClientAsLost" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:text="Perdido"
+                        android:textSize="10sp"
+                        android:textColor="#666"
+                        android:gravity="center" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/non_default_status_actions"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:text="Ganho"
-                android:textSize="10sp"
-                android:textColor="#666"
-                android:gravity="center" />
+                android:orientation="horizontal"
+                android:visibility="gone">
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/reset_status_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/reset"
+                        android:backgroundTint="@color/colorDetailInfo"
+                        android:padding="8dp"
+                        app:tint="@color/black"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Retornar status original"
+                        android:onClick="returnToOriginalStatus" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:text="Resetar"
+                        android:textSize="10sp"
+                        android:textColor="#666"
+                        android:gravity="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/close_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/close"
-                android:backgroundTint="@color/colorDetailInfo"
-                android:padding="8dp"
-                app:tint="@color/black"
-                android:clickable="true"
-                android:focusable="true"
-                android:contentDescription="Oportunidade Perdida"
-                android:onClick="setClientAsLost" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
-                android:text="Perdido"
-                android:textSize="10sp"
-                android:textColor="#666"
-                android:gravity="center" />
-
-        </LinearLayout>
-
     </LinearLayout>
-
 </RelativeLayout>
