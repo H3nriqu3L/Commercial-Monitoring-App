@@ -116,6 +116,26 @@ public class MainActivity extends AppCompatActivity {
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int screenWidth = displayMetrics.widthPixels;
 
+        TextView vendedorNome = popupView.findViewById(R.id.cliente_nome);
+        TextView vendedorEmail = popupView.findViewById(R.id.cliente_email);
+
+        // Configurar os dados do usuário
+        UserSession session = UserSession.getInstance(this);
+        String userEmail = session.getUserEmail();
+        String userNome = session.getUserName();
+
+        if (userEmail != null) {
+            vendedorEmail.setText(userEmail);
+        } else {
+            vendedorEmail.setText("Email não disponível");
+        }
+
+        if (userNome != null) {
+            vendedorNome.setText(userNome);
+        } else {
+            vendedorNome.setText("Nome não disponível");
+        }
+
 
         int width = (int) (screenWidth * 0.65); // x% of screen width
         int height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -207,7 +227,13 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout item5 = popupView.findViewById(R.id.menu_item5);
         item5.setOnClickListener(v -> {
-            Toast.makeText(this, "Item 5 clicado", Toast.LENGTH_SHORT).show();
+            session.clearSession();
+
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+
+            finish();
+
             popupWindow.dismiss();
         });
     }

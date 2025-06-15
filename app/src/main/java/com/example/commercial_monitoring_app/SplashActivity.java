@@ -34,7 +34,17 @@ public class SplashActivity extends AppCompatActivity {
             loadData();
 
             runOnUiThread(()->{
-                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                UserSession session = UserSession.getInstance(SplashActivity.this);
+
+                Intent intent;
+                if (session.isLoggedIn()) {
+                    // Usuário já está logado, vai direto para MainActivity
+                    intent = new Intent(SplashActivity.this, MainActivity.class);
+                } else {
+                    // Usuário não está logado, vai para LoginActivity
+                    intent = new Intent(SplashActivity.this, LoginActivity.class);
+                }
+
                 startActivity(intent);
                 finish();
             });
