@@ -103,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
         for (Responsavel responsavel : responsaveis) {
             for (NavigationResponse.User user : users) {
                 if (user.getEmail().equalsIgnoreCase(email)) {
-                    handleSuccessfulLogin(responsavel, users, user.getEmail());  // Pass users list here
+                    handleSuccessfulLogin(responsavel, users, user.getEmail(), user.getName());  // Pass users list here
                     return;
                 }
             }
@@ -111,9 +111,9 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, "Credenciais inválidas ou usuário não autorizado", Toast.LENGTH_SHORT).show();
     }
 
-    private void handleSuccessfulLogin(Responsavel responsavel, List<NavigationResponse.User> users, String email) {
+    private void handleSuccessfulLogin(Responsavel responsavel, List<NavigationResponse.User> users, String email, String nome) {
         UserSession session = UserSession.getInstance(LoginActivity.this);
-        session.saveUserSession(responsavel.id, email);
+        session.saveUserSession(responsavel.id, email, nome);
 
         MyApp.setNavigationUsersList(users);
 

@@ -11,6 +11,7 @@ public class UserSession {
     private static final String PREF_NAME = "UserSessionPref";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_EMAIL = "user_email";
+    private static final String KEY_USER_NAME = "user_name";
 
     private static SharedPreferences prefs = null;
     private final SharedPreferences.Editor editor;
@@ -31,14 +32,19 @@ public class UserSession {
         return prefs.getInt(KEY_USER_ID, -1);
     }
 
-    public void saveUserSession(int id, String email) {
+    public void saveUserSession(int id, String email, String nome) {
         editor.putInt(KEY_USER_ID, id);
         editor.putString(KEY_USER_EMAIL, email);
+        editor.putString(KEY_USER_NAME, nome);
         editor.apply();
     }
 
     public String getUserEmail() {
         return prefs.getString(KEY_USER_EMAIL, null);
+    }
+
+    public String getUserName() {
+        return prefs.getString(KEY_USER_NAME, null);
     }
 
     public void clearSession() {

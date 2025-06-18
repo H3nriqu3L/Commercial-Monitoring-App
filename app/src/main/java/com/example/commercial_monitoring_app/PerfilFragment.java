@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,8 +21,28 @@ public class PerfilFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_perfil, container, false);
-        return view;
 
+
+        TextView vendedorEmail = view.findViewById(R.id.vendedor_email);
+        TextView vendedorNome = view.findViewById(R.id.vendedor_nome);
+
+        UserSession session = UserSession.getInstance(getContext());
+        String userEmail = session.getUserEmail();
+        String userNome = session.getUserName();
+
+        // Definir o email no TextView
+        if (userEmail != null) {
+            vendedorEmail.setText(userEmail);
+        } else {
+            vendedorEmail.setText("Email não disponível");
+        }
+        if(userNome!=null){
+            vendedorNome.setText(userNome);
+        }else{
+            vendedorNome.setText("Nome não disponível");
+        }
+
+        return view;
     }
 }
 
