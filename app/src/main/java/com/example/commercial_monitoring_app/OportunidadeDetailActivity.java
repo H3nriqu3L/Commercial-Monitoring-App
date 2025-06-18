@@ -315,7 +315,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
             Call<Void> call = apiService.alterarResponsavel(
-                    Integer.parseInt(clientId),
+                    oportunidadeId,
                     userIdResponsavel,
                     responsavelNome,
                     1
@@ -325,10 +325,35 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(OportunidadeDetailActivity.this,
-                                "Responsável alterado com sucesso",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
+                        // Agora chama o atualizarDadosOportunidade
+                        Call<Void> updateCall = apiService.atualizarDadosOportunidade(
+                                oportunidadeId,
+                                Integer.parseInt(clientId),
+                                1
+                        );
+
+                        updateCall.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(OportunidadeDetailActivity.this,
+                                            "Responsável alterado e dados atualizados com sucesso",
+                                            Toast.LENGTH_SHORT).show();
+                                    finishWithClientRefresh();
+                                } else {
+                                    handleUpdateError(response);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(OportunidadeDetailActivity.this,
+                                        "Responsável alterado mas erro ao atualizar dados: " + t.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                                Log.e("API_ERROR", "Update data failure", t);
+                            }
+                        });
+
                     } else {
                         try {
                             String errorMsg = "Erro ao alterar responsável";
@@ -354,6 +379,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                     Log.e("API_ERROR", "Network failure", t);
                 }
             });
+
         } catch (Exception e) {
             Toast.makeText(this,
                     "Erro inesperado: " + e.getMessage(),
@@ -361,6 +387,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             Log.e("API_ERROR", "Unexpected error", e);
         }
     }
+
 
     private void finishWithClientRefresh() {
         ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
