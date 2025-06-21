@@ -221,8 +221,10 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayout item4 = popupView.findViewById(R.id.menu_item4);
         item4.setOnClickListener(v -> {
-            Toast.makeText(this, "Item 4 clicado", Toast.LENGTH_SHORT).show();
             popupWindow.dismiss();
+
+            BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+            bottomNavigation.setSelectedItemId(R.id.page_home);
         });
 
         LinearLayout item5 = popupView.findViewById(R.id.menu_item5);

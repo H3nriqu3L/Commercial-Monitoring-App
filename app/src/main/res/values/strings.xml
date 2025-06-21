@@ -5,13 +5,13 @@
     <string name="oportunidades">Oportunidades</string>
     <string name="insights">Insights</string>
     <string-array name="time_filter_options">
-        <item>Última semana</item>
-        <item>Último mês</item>
-        <item>Último trimestre</item>
+        <item>Semana</item>
+        <item>Mês</item>
+        <item>Último ano</item>
     </string-array>
     <string name="menuitem1">Meu Perfil</string>
     <string name="menuitem2">Oportunidades</string>
-    <string name="menuitem4">Configurações</string>
+    <string name="menuitem4">Home</string>
     <string name="menuitem3">Insights</string>
     <string name="menuitem5">Logout</string>
     <string name="clientePotencial">Adicionar Cliente Potencial</string>

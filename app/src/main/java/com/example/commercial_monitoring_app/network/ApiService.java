@@ -1,5 +1,6 @@
 package com.example.commercial_monitoring_app.network;
 
+import com.example.commercial_monitoring_app.model.Agendamento;
 import com.example.commercial_monitoring_app.model.Client;
 import com.example.commercial_monitoring_app.model.NavigationResponse;
 import com.example.commercial_monitoring_app.model.Oportunidade;
@@ -30,6 +31,13 @@ public interface ApiService {
     })
     @POST("api/Oportunidade/listarOportunidades")
     Call<ResponseWrapper<Oportunidade>> listarOportunidades();
+
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Agendamento/listarAgendamentos")
+    Call<ResponseWrapper<Agendamento>> listarAgendamentos();
 
     @FormUrlEncoded
     @Headers({
