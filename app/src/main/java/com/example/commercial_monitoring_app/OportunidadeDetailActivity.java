@@ -29,7 +29,10 @@ import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.RetrofitClient;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -112,8 +115,8 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
         StringBuilder contactInfo = new StringBuilder();
         if (clientTelefone != null) {
-            contactInfo.append("Telefone: ").append(clientTelefone).append("\n");
-            clientProfilePhone.setText(clientTelefone);
+            contactInfo.append("Telefone: ").append(formatarTelefone(clientTelefone)).append("\n");
+            clientProfilePhone.setText(formatarTelefone(clientTelefone));
         }
         if (clientEmail != null){
             contactInfo.append("Email: ").append(clientEmail);
@@ -123,7 +126,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
         StringBuilder docInfo = new StringBuilder();
         if (clientCpf != null) docInfo.append("CPF: ").append(clientCpf).append("\n");
-        if (clientNascimento != null) docInfo.append("Nascimento: ").append(clientNascimento);
+        if (clientNascimento != null) docInfo.append("Nascimento: ").append(formatarDataNascimento(clientNascimento));
         clientDocView.setText(docInfo.toString());
 
 
@@ -208,6 +211,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
     public void navigateBack(View view) {
         finish();
     }
+
 
     public void callClient(View view) {
         String clientTelefone = getIntent().getStringExtra("client_telefone");
@@ -696,6 +700,56 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             Toast.makeText(OportunidadeDetailActivity.this,
                     "Erro ao processar resposta de atualização",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String formatarTelefone(String telefoneOriginal) {
+        try {
+            String telefone = telefoneOriginal.replaceAll("[^+0-9]", "");
+
+            // Verifica se o telefone tem o formato esperado (+55...)
+            if (!telefone.startsWith("+55") || telefone.length() < 12) {
+                return telefoneOriginal;
+            }
+
+            String codigoPais = telefone.substring(0, 3); // +55
+            String codigoArea = telefone.substring(3, 5);  // 11
+            String numero = telefone.substring(5);         // resto do número
+
+            // Formata baseado no tamanho do número
+            if (numero.length() == 8) {
+                return String.format("%s (%s) %s-%s",
+                        codigoPais,
+                        codigoArea,
+                        numero.substring(0, 4),
+                        numero.substring(4));
+            } else if (numero.length() == 9) {
+                return String.format("%s (%s) %s-%s",
+                        codigoPais,
+                        codigoArea,
+                        numero.substring(0, 5),
+                        numero.substring(5));
+            } else {
+                // Formato não reconhecido
+                return telefoneOriginal;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return telefoneOriginal;
+        }
+    }
+
+    private String formatarDataNascimento(String dataNascimentoOriginal) {
+        try {
+            SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+            SimpleDateFormat formatoSaida = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+            return formatoSaida.format(formatoEntrada.parse(dataNascimentoOriginal));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dataNascimentoOriginal;
         }
     }
 

@@ -1,6 +1,8 @@
 // HomeFragment.java
 package com.example.commercial_monitoring_app;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -43,6 +49,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class HomeFragment extends Fragment {
 
     private TextView oportunidadesGanhas;
@@ -51,10 +61,25 @@ public class HomeFragment extends Fragment {
     private AgendamentoAdapter agendamentoAdapter;
     private List<Agendamento> agendamentoList;
     private List<Agendamento> filteredAgendamento;
+    private ActivityResultLauncher<Intent> homeDetailLauncher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Infla o layout do fragment
+
+        homeDetailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // Fazer refresh quando retornar com RESULT_OK
+                            Log.d("HomeFragment", "RESULT_OK recebido, fazendo refresh");
+                            refreshAtividades();
+                        }
+                    }
+                }
+        );
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -92,7 +117,7 @@ public class HomeFragment extends Fragment {
 
 
         filteredAgendamento = new ArrayList<>(agendamentoList);
-        agendamentoAdapter = new AgendamentoAdapter(filteredAgendamento);
+        agendamentoAdapter = new AgendamentoAdapter(filteredAgendamento, homeDetailLauncher);
 
         recyclerView.setAdapter(agendamentoAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
@@ -111,5 +136,45 @@ public class HomeFragment extends Fragment {
     private void loadOportunidadesAbertas() {
         // Procura quantidade oportunidades abertas na API e seta valor
         oportunidadesAbertas.setText("13");
+    }
+
+    public void refreshAtividades() {
+        Log.d("HomeFragment", "refreshAtividades() CHAMADO - fazendo nova requisição da API");
+
+        ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+
+        Callback<ResponseWrapper<Agendamento>> callback = new Callback<ResponseWrapper<Agendamento>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Agendamento>> call, Response<ResponseWrapper<Agendamento>> response) {
+                Log.d("HomeFragment", "API callback executado - resposta recebida");
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        // Pegar a lista atualizada que foi setada pelo fetchAgendamento
+                        agendamentoList = MyApp.getAgendamentoList();
+                        Log.d("HomeFragment", "Atualizando UI com " + agendamentoList.size() + " agendamentos");
+
+                        Log.d("HomeFragment", "Adapter atualizado com dados da API");
+                    });
+                } else {
+                    Log.e("HomeFragment", "Activity é null no callback da API");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Agendamento>> call, Throwable t) {
+                Log.e("HomeFragment", "Erro ao carregar agendamentos: " + t.getMessage());
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(),
+                                "Erro ao atualizar lista: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        };
+
+        MyApp.fetchAgendamentoFromApi(callback, apiService);
     }
 }

@@ -12,10 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.commercial_monitoring_app.AtividadeDetailActivity;
 import com.example.commercial_monitoring_app.MyApp;
 import com.example.commercial_monitoring_app.OportunidadeDetailActivity;
 import com.example.commercial_monitoring_app.R;
@@ -34,9 +36,15 @@ import java.util.Optional;
 public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.AgendamentoViewHolder> {
 
     private List<Agendamento> agendamentoList;
+    private ActivityResultLauncher<Intent> activityLauncher;
 
     public AgendamentoAdapter(List<Agendamento> agendamentoList) {
         this.agendamentoList= agendamentoList;
+    }
+
+    public AgendamentoAdapter(List<Agendamento> agendamentoList, ActivityResultLauncher<Intent> launcher) {
+        this.agendamentoList = agendamentoList;
+        this.activityLauncher = launcher;
     }
 
     public static class AgendamentoViewHolder extends RecyclerView.ViewHolder {
@@ -67,13 +75,27 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
 
         holder.atividadeTitle.setText(agendamento.getContato());
         holder.atividadeCliente.setText(agendamento.getPessoaNome());
-        holder.atividadeData.setText(formatarData(agendamento.getMomento()));
+        holder.atividadeData.setText(formatarData(agendamento.getVencimento()));
         holder.atividadeResponsavel.setText(agendamento.getResponsavelNome());
 
 
 
         holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "tarefa clicada", Toast.LENGTH_SHORT).show();
+
+            Context context = v.getContext();
+            Intent intent = new Intent(context, AtividadeDetailActivity.class);
+            intent.putExtra("atividade", agendamento.getContato());
+            intent.putExtra("cliente_nome", agendamento.getPessoaNome());
+            intent.putExtra("vencimento", agendamento.getVencimento());
+            intent.putExtra("responsavel", agendamento.getResponsavelNome());
+            intent.putExtra("descricao", agendamento.getDescricao());
+            intent.putExtra("tipo_atividade", agendamento.getTipoNome());
+            intent.putExtra("cliente_numero", agendamento.getTelefone());
+            intent.putExtra("cliente_email", agendamento.getEmail());
+            intent.putExtra("atividade_id", agendamento.getId());
+
+
+            activityLauncher.launch(intent);
         });
 
     }
