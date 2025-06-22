@@ -32,6 +32,10 @@
             android:name=".AddClientActivity"
             android:exported="false">
         </activity>
+        <activity
+            android:name=".AtividadeDetailActivity"
+            android:exported="false">
+        </activity>
         <activity android:name=".OportunidadeDetailActivity" />
     </application>
 
