@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -24,17 +25,15 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LeadsFragment extends Fragment {
 
-    private BarChart barChart;
-    private LineChart lineChart;
-    private Spinner spinnerProcessos;
+    private HorizontalBarChart barChart;
+    private ArrayList<String> steps = new ArrayList<>();
 
-    public LeadsFragment() {
-        // Construtor vazio obrigatório
-    }
+    public LeadsFragment() { }
 
     @Nullable
     @Override
@@ -45,79 +44,69 @@ public class LeadsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_leads, container, false);
 
         barChart = view.findViewById(R.id.barChart);
-        lineChart = view.findViewById(R.id.lineChart);
-        spinnerProcessos = view.findViewById(R.id.spinner_processos);
 
-        setupSpinner();
+        updateSteps(Arrays.asList("Prospecção", "Qualificação", "Proposta", "Fechamento"));
+        updateValues(Arrays.asList(10f, 7f, 5f, 3f), Arrays.asList(5f, 10f, 8f, 12f));
+
+        setupCharts();
 
         return view;
     }
 
-    private void setupSpinner() {
-        List<String> processos = new ArrayList<>();
-        processos.add("Captação Graduação");
-        processos.add("Acompanhamento do Estudante");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, processos);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerProcessos.setAdapter(adapter);
-
-        spinnerProcessos.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
-                    setupGraficosCaptacao();
-                } else {
-                    setupGraficosAcompanhamento();
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+    private void setupCharts() {
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getAxisLeft().setEnabled(false);
+        barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        barChart.getXAxis().setDrawGridLines(false);
+        barChart.getDescription().setEnabled(false);
+        barChart.getXAxis().setGranularity(1f);
     }
 
-    private void setupGraficosCaptacao() {
-        String[] etapas = {"Interessado", "Inscrito", "Visita", "Matrícula"};
-        int[] valores = {4, 25, 20, 25};
-        int[] tempos = {10, 5, 2, 7};
-        atualizarGraficos(etapas, valores, tempos);
+    public void updateSteps(List<String> steps) {
+        this.steps = new ArrayList<>(steps);
+
+        barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(this.steps));
+        barChart.getXAxis().setGranularity(1f);
+        barChart.getXAxis().setGranularityEnabled(true);
+
+        barChart.invalidate();
     }
 
-    private void setupGraficosAcompanhamento() {
-        String[] etapas = {"Regulares", "Em alerta", "Evadidos", "Egressos"};
-        int[] valores = {25, 10, 5, 7};
-        int[] tempos = {3, 6, 13, 11};
-        atualizarGraficos(etapas, valores, tempos);
-    }
-
-    private void atualizarGraficos(String[] etapas, int[] valoresBar, int[] valoresLine) {
+    public void updateValues(List<Float> barValues, List<Float> lineValues) {
         List<BarEntry> barEntries = new ArrayList<>();
         List<Entry> lineEntries = new ArrayList<>();
 
-        for (int i = 0; i < etapas.length; i++) {
-            barEntries.add(new BarEntry(i, valoresBar[i]));
-            lineEntries.add(new Entry(i, valoresLine[i]));
+        for (int i = 0; i < barValues.size(); i++) {
+            barEntries.add(new BarEntry(i, barValues.get(i)));
         }
 
-        BarDataSet barDataSet = new BarDataSet(barEntries, "Oportunidades");
-        barDataSet.setColors(new int[]{R.color.teal_200, R.color.teal_700, R.color.purple_200, R.color.purple_500}, requireContext());
-        barDataSet.setValueTextSize(14f);
-        BarData barData = new BarData(barDataSet);
-        barChart.setData(barData);
-        XAxis xBar = barChart.getXAxis();
-        xBar.setValueFormatter(new IndexAxisValueFormatter(etapas));
-        barChart.invalidate();
+        for (int i = 0; i < lineValues.size(); i++) {
+            lineEntries.add(new Entry(i, lineValues.get(i)));
+        }
 
-        LineDataSet lineDataSet = new LineDataSet(lineEntries, "Tempo Médio (dias)");
-        lineDataSet.setColor(requireContext().getColor(R.color.purple_500));
-        lineDataSet.setLineWidth(2f);
-        lineDataSet.setCircleRadius(5f);
-        lineDataSet.setValueTextSize(12f);
-        LineData lineData = new LineData(lineDataSet);
-        lineChart.setData(lineData);
-        XAxis xLine = lineChart.getXAxis();
-        xLine.setValueFormatter(new IndexAxisValueFormatter(etapas));
-        lineChart.invalidate();
+        BarDataSet barDataSet = new BarDataSet(barEntries, "Quantidade de Oportunidades");
+
+        List<Integer> colors = new ArrayList<>();
+        int[] palette = new int[] {
+                R.color.purple_700,
+                R.color.purple_200,
+                R.color.teal_700,
+                android.R.color.holo_blue_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light
+        };
+        for (int i = 0; i < barEntries.size(); i++) {
+            int colorRes = palette[i % palette.length];
+            colors.add(getResources().getColor(colorRes, null));
+        }
+        barDataSet.setColors(colors);
+
+        barDataSet.setValueTextSize(12f);
+        barDataSet.setValueTextColor(getResources().getColor(android.R.color.black, null));
+
+        BarData barData = new BarData(barDataSet);
+        barData.setBarWidth(0.6f);
+        barChart.setData(barData);
+        barChart.invalidate();
     }
 }
