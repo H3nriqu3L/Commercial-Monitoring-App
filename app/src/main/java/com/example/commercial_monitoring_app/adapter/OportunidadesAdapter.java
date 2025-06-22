@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,28 +33,21 @@ import java.util.Optional;
 public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdapter.OportunidadeViewHolder> {
 
     private List<Oportunidade> oportunidades;
-    private OnDeleteClickListener deleteListener;
+    private ActivityResultLauncher<Intent> activityLauncher;
 
-    public interface OnDeleteClickListener {
-        void onDeleteClick(int position, Oportunidade oportunidade);
-    }
 
-    public OportunidadesAdapter(List<Oportunidade> oportunidades, OnDeleteClickListener deleteListener) {
+    public OportunidadesAdapter(List<Oportunidade> oportunidades, ActivityResultLauncher<Intent> launcher) {
         this.oportunidades = oportunidades;
-        this.deleteListener = deleteListener;
+        this.activityLauncher = launcher;
     }
 
-    public OportunidadesAdapter(List<Oportunidade> oportunidades) {
-        this.oportunidades = oportunidades;
-        this.deleteListener = null;
-    }
 
     public static class OportunidadeViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView subtitle;
         TextView etapaStatus;
         TextView responsavelName;
-        // ImageView deleteIcon; // Commented out - delete icon removed from layout
+
 
         public OportunidadeViewHolder(View itemView) {
             super(itemView);
@@ -61,7 +55,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             subtitle = itemView.findViewById(R.id.oportunidadeSubtitle);
             etapaStatus = itemView.findViewById(R.id.oportunidadeEtapaStatus);
             responsavelName = itemView.findViewById(R.id.responsavelCard);
-            // deleteIcon = itemView.findViewById(R.id.deleteOportunidadeIcon); // Commented out - ID doesn't exist
+
         }
     }
 
@@ -199,7 +193,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
                 intent.putExtra("client_cep", cliente.getCep());
                 intent.putExtra("client_image", imagem);
             }
-            context.startActivity(intent);
+            activityLauncher.launch(intent);
         });
 
     }

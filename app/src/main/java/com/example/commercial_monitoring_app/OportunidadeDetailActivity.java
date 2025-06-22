@@ -449,6 +449,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                                     Toast.makeText(OportunidadeDetailActivity.this,
                                             "Oportunidade ganha e dados atualizados com sucesso",
                                             Toast.LENGTH_SHORT).show();
+                                    setResult(RESULT_OK);
                                     finishWithClientRefresh();
                                 } else {
                                     handleUpdateError(response);
@@ -505,7 +506,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Por favor, informe o motivo da perda", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                setResult(RESULT_OK);
                 executeLostOpportunityCall(motivoPerda);
             });
             builder.setNegativeButton("Cancelar", null);
@@ -554,6 +555,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                                 Toast.makeText(OportunidadeDetailActivity.this,
                                         "Oportunidade marcada como perdida e dados atualizados",
                                         Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
                                 finishWithClientRefresh();
                             } else {
                                 handleUpdateError(response);

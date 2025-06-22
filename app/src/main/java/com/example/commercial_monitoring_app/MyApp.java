@@ -79,8 +79,8 @@ public class MyApp extends Application {
         return personalDataList != null ? personalDataList : new ArrayList<>();
     }
 
-    public void setOportunidadesList(List<Oportunidade> newList) {
-        this.oportunidadeList = newList != null ? newList : new ArrayList<>();
+    public static void setOportunidadesList(List<Oportunidade> newList) {
+        oportunidadeList = newList != null ? newList : new ArrayList<>();
     }
 
     public static void setPersonalDataList(List<PersonalData> list) {

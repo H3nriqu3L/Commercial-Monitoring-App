@@ -1,6 +1,8 @@
 package com.example.commercial_monitoring_app;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.SearchView;
 import android.widget.Toast;
 
@@ -22,6 +29,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.commercial_monitoring_app.adapter.OportunidadesAdapter;
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
 import com.example.commercial_monitoring_app.model.Oportunidade;
+import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.ResponseWrapper;
+import com.example.commercial_monitoring_app.network.RetrofitClient;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
@@ -30,6 +40,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class OportunidadesFragment extends Fragment {
 
@@ -43,12 +57,27 @@ public class OportunidadesFragment extends Fragment {
     private TabLayout tabLayout;
     private String currentTab = "captacao"; // "captacao" ou "acompanhamento"
 
+    private ActivityResultLauncher<Intent> oportunidadeDetailLauncher;
+
     public OportunidadesFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        oportunidadeDetailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // Fazer refresh quando retornar com RESULT_OK
+                            Log.d("OportunidadesFragment", "RESULT_OK recebido, fazendo refresh");
+                            refreshOportunidades();
+                        }
+                    }
+                }
+        );
         return inflater.inflate(R.layout.fragment_oportunidades, container, false);
     }
 
@@ -74,7 +103,8 @@ public class OportunidadesFragment extends Fragment {
         // Create initial filtered list (copy of original)
         filteredOportunidades = new ArrayList<>(oportunidadesList);
 
-        oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades);
+        //oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades);
+        oportunidadesAdapter = new OportunidadesAdapter(filteredOportunidades, oportunidadeDetailLauncher);
 
         recyclerView.setAdapter(oportunidadesAdapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
@@ -336,38 +366,6 @@ public class OportunidadesFragment extends Fragment {
         applyFiltersAndSearch();
     }
 
-    private void showDeleteConfirmation(int position, Oportunidade oportunidade) {
-        if (getContext() == null) return;
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Excluir oportunidade")
-                .setMessage("Deseja realmente excluir a oportunidade de " + oportunidade.getPessoaNome() + "?")
-                .setPositiveButton("Excluir", (dialog, which) -> deleteOportunidade(position, oportunidade))
-                .setNegativeButton("Cancelar", null)
-                .show();
-    }
-
-    private void deleteOportunidade(int position, Oportunidade oportunidade) {
-        try {
-            // Remove imediatamente da lista local
-            List<Oportunidade> currentList = MyApp.getOportunidadeList();
-            currentList.remove(position);
-            oportunidadesAdapter.notifyItemRemoved(position);
-
-            MyApp.excluirOportunidadeEAtualizarLista(Integer.parseInt(oportunidade.getId()),
-                    new MyApp.OnOportunidadeDeletedListener() {
-                        @Override
-                        public void onOportunidadeDeleted() {
-                            refreshOportunidadesList();
-                        }
-                    });
-        } catch (Exception e) {
-            Log.e("OportunidadesFragment", "Erro ao deletar oportunidade", e);
-            Toast.makeText(getContext(), "Erro ao deletar oportunidade", Toast.LENGTH_SHORT).show();
-            // Reverte a UI em caso de erro
-            oportunidadesAdapter.notifyItemChanged(position);
-        }
-    }
 
     private List<Oportunidade> sortCaptacaoList(List<Oportunidade> oportunidades) {
         // Definindo a ordem de prioridade das etapas
@@ -449,31 +447,47 @@ public class OportunidadesFragment extends Fragment {
         return sortedList;
     }
 
-    public void refreshOportunidadesList() {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                oportunidadesList = MyApp.getOportunidadeList();
-                Log.d("OportunidadesFragment", "Atualizando lista com " + oportunidadesList.size() + " oportunidades");
-
-                // Reaplica todos os filtros
-                applyFiltersAndSearch();
-
-                Log.d("OportunidadesFragment", "Adapter atualizado");
-            });
-        }
-    }
 
     public void refreshOportunidades() {
-        if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                oportunidadesList = MyApp.getOportunidadeList();
-                Log.d("OportunidadesFragment", "Atualizando lista com " + oportunidadesList.size() + " oportunidades");
+        Log.d("OportunidadesFragment", "refreshOportunidades() CHAMADO - fazendo nova requisição da API");
 
-                // Reaplica todos os filtros
-                applyFiltersAndSearch();
+        ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
-                Log.d("OportunidadesFragment", "Adapter atualizado");
-            });
-        }
+        Callback<ResponseWrapper<Oportunidade>> callback = new Callback<ResponseWrapper<Oportunidade>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Oportunidade>> call, Response<ResponseWrapper<Oportunidade>> response) {
+                Log.d("OportunidadesFragment", "API callback executado - resposta recebida");
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        // Pegar a lista atualizada que foi setada pelo fetchOportunidadesFromApi
+                        oportunidadesList = MyApp.getOportunidadeList();
+                        Log.d("OportunidadesFragment", "Atualizando UI com " + oportunidadesList.size() + " oportunidades");
+
+                        // Reaplicar filtros e atualizar adapter
+                        applyFiltersAndSearch();
+
+                        Log.d("OportunidadesFragment", "Adapter atualizado com dados da API");
+                    });
+                } else {
+                    Log.e("OportunidadesFragment", "Activity é null no callback da API");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+                Log.e("OportunidadesFragment", "Erro ao carregar oportunidades: " + t.getMessage());
+
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(),
+                                "Erro ao atualizar lista: " + t.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        };
+
+        MyApp.fetchOportunidadesFromApi(callback, apiService);
     }
 }
