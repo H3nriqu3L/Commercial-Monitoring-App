@@ -73,11 +73,14 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
 
         String etapaNome = oportunidade.getEtapaNome();
         String responsavelNome = "Sem Responsável";
+        String cursoNome = "Curso Ausente";
 
         if(oportunidade.getResponsavelNome()!=null){
             responsavelNome = oportunidade.getResponsavelNome();
         }
-
+        if(oportunidade.getCursoNome()!=null){
+            cursoNome = "Curso: " + oportunidade.getCursoNome();
+        }
 
 
         holder.title.setText(oportunidade.getPessoaNome());
@@ -86,42 +89,43 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         holder.responsavelName.setText(responsavelNome);
 
 
+
         // Define a cor do texto baseado na etapa
         switch (etapaNome) {
             case "Potencial":
                 // Azul claro mais escuro - Interesse Inicial
                 holder.etapaStatus.setTextColor(Color.parseColor("#7CBCE4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Interessado":
                 // Azul médio - Usuário Curioso
                 holder.etapaStatus.setTextColor(Color.parseColor("#5DA9D4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Inscrito parcial":
                 // Azul-esverdeado - Usuário Engajado
                 holder.etapaStatus.setTextColor(Color.parseColor("#76C1D4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Inscrito":
                 // Verde-água - Usuário Recorrente
                 holder.etapaStatus.setTextColor(Color.parseColor("#4FB8A8"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Convocado":
                 // Verde médio - Usuário Qualificado
                 holder.etapaStatus.setTextColor(Color.parseColor("#3DAA76"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Confirmado":
                 // Verde intenso - Usuário Quase Confirmado
                 holder.etapaStatus.setTextColor(Color.parseColor("#2E8B57"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Matriculado":
                 // Verde escuro - Usuário Confirmado
                 holder.etapaStatus.setTextColor(Color.parseColor("#1E6439"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
 
 

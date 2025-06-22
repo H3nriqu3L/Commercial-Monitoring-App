@@ -343,6 +343,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                                     Toast.makeText(OportunidadeDetailActivity.this,
                                             "Responsável alterado e dados atualizados com sucesso",
                                             Toast.LENGTH_SHORT).show();
+                                    setResult(RESULT_OK);
                                     finishWithClientRefresh();
                                 } else {
                                     handleUpdateError(response);
