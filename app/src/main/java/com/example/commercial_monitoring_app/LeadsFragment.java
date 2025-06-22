@@ -1,5 +1,6 @@
 package com.example.commercial_monitoring_app;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.commercial_monitoring_app.model.Oportunidade;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.HorizontalBarChart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -23,10 +25,14 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 
 public class LeadsFragment extends Fragment {
 
@@ -45,8 +51,28 @@ public class LeadsFragment extends Fragment {
 
         barChart = view.findViewById(R.id.barChart);
 
-        updateSteps(Arrays.asList("Prospecção", "Qualificação", "Proposta", "Fechamento"));
-        updateValues(Arrays.asList(10f, 7f, 5f, 3f), Arrays.asList(5f, 10f, 8f, 12f));
+        List<Oportunidade> oportunidadeList = MyApp.getOportunidadeList();
+        Map<String, Integer> etapaCountMap = new HashMap<>();
+
+        for (Oportunidade oportunidade : oportunidadeList) {
+            String etapa = oportunidade.getEtapaNome();
+            if (etapa == null) continue;
+
+            if (etapaCountMap.containsKey(etapa)) {
+                etapaCountMap.put(etapa, etapaCountMap.get(etapa) + 1);
+            } else {
+                etapaCountMap.put(etapa, 1);
+            }
+        }
+        List<String> etapasList = new ArrayList<>(etapaCountMap.keySet());
+        List<Integer> valores = new ArrayList<>();
+
+        for (String etapa : etapasList) {
+            valores.add(etapaCountMap.get(etapa));
+        }
+
+        updateSteps(etapasList);
+        updateValues(valores);
 
         setupCharts();
 
@@ -59,29 +85,21 @@ public class LeadsFragment extends Fragment {
         barChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         barChart.getXAxis().setDrawGridLines(false);
         barChart.getDescription().setEnabled(false);
-        barChart.getXAxis().setGranularity(1f);
     }
 
     public void updateSteps(List<String> steps) {
         this.steps = new ArrayList<>(steps);
 
         barChart.getXAxis().setValueFormatter(new IndexAxisValueFormatter(this.steps));
-        barChart.getXAxis().setGranularity(1f);
-        barChart.getXAxis().setGranularityEnabled(true);
 
         barChart.invalidate();
     }
 
-    public void updateValues(List<Float> barValues, List<Float> lineValues) {
+    public void updateValues(List<Integer> barValues) {
         List<BarEntry> barEntries = new ArrayList<>();
-        List<Entry> lineEntries = new ArrayList<>();
 
         for (int i = 0; i < barValues.size(); i++) {
             barEntries.add(new BarEntry(i, barValues.get(i)));
-        }
-
-        for (int i = 0; i < lineValues.size(); i++) {
-            lineEntries.add(new Entry(i, lineValues.get(i)));
         }
 
         BarDataSet barDataSet = new BarDataSet(barEntries, "Quantidade de Oportunidades");
@@ -101,11 +119,20 @@ public class LeadsFragment extends Fragment {
         }
         barDataSet.setColors(colors);
 
+        barDataSet.setDrawValues(true);
         barDataSet.setValueTextSize(12f);
-        barDataSet.setValueTextColor(getResources().getColor(android.R.color.black, null));
+        barDataSet.setValueTextColor(Color.BLACK);
 
         BarData barData = new BarData(barDataSet);
         barData.setBarWidth(0.6f);
+
+        barData.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getBarLabel(BarEntry barEntry) {
+                return String.format("%d", barEntry.getY());
+            }
+        });
+
         barChart.setData(barData);
         barChart.invalidate();
     }
