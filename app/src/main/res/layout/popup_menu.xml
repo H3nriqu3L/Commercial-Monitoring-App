@@ -86,6 +86,29 @@
             android:textSize="16sp" />
     </LinearLayout>
 
+    <!-- Item4, configuracoes -->
+    <LinearLayout
+        android:id="@+id/menu_item4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/home"
+            app:tint="#000000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/menuitem4"
+            android:textSize="16sp" />
+    </LinearLayout>
+
 
     <!-- Item2, dashboard -->
     <LinearLayout
@@ -135,28 +158,7 @@
     </LinearLayout>
 
 
-    <!-- Item4, configuracoes -->
-    <LinearLayout
-        android:id="@+id/menu_item4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="16dp">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/settings"
-            app:tint="#000000"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/menuitem4"
-            android:textSize="16sp" />
-    </LinearLayout>
 
 
     <!-- Item5, Logout -->

@@ -29,7 +29,10 @@ import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.RetrofitClient;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -112,8 +115,8 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
         StringBuilder contactInfo = new StringBuilder();
         if (clientTelefone != null) {
-            contactInfo.append("Telefone: ").append(clientTelefone).append("\n");
-            clientProfilePhone.setText(clientTelefone);
+            contactInfo.append("Telefone: ").append(formatarTelefone(clientTelefone)).append("\n");
+            clientProfilePhone.setText(formatarTelefone(clientTelefone));
         }
         if (clientEmail != null){
             contactInfo.append("Email: ").append(clientEmail);
@@ -123,7 +126,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
         StringBuilder docInfo = new StringBuilder();
         if (clientCpf != null) docInfo.append("CPF: ").append(clientCpf).append("\n");
-        if (clientNascimento != null) docInfo.append("Nascimento: ").append(clientNascimento);
+        if (clientNascimento != null) docInfo.append("Nascimento: ").append(formatarDataNascimento(clientNascimento));
         clientDocView.setText(docInfo.toString());
 
 
@@ -208,6 +211,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
     public void navigateBack(View view) {
         finish();
     }
+
 
     public void callClient(View view) {
         String clientTelefone = getIntent().getStringExtra("client_telefone");
@@ -315,7 +319,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
             Call<Void> call = apiService.alterarResponsavel(
-                    Integer.parseInt(clientId),
+                    oportunidadeId,
                     userIdResponsavel,
                     responsavelNome,
                     1
@@ -325,10 +329,36 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful()) {
-                        Toast.makeText(OportunidadeDetailActivity.this,
-                                "Responsável alterado com sucesso",
-                                Toast.LENGTH_SHORT).show();
-                        finish();
+                        // Agora chama o atualizarDadosOportunidade
+                        Call<Void> updateCall = apiService.atualizarDadosOportunidade(
+                                oportunidadeId,
+                                Integer.parseInt(clientId),
+                                1
+                        );
+
+                        updateCall.enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(OportunidadeDetailActivity.this,
+                                            "Responsável alterado e dados atualizados com sucesso",
+                                            Toast.LENGTH_SHORT).show();
+                                    setResult(RESULT_OK);
+                                    finishWithClientRefresh();
+                                } else {
+                                    handleUpdateError(response);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(OportunidadeDetailActivity.this,
+                                        "Responsável alterado mas erro ao atualizar dados: " + t.getMessage(),
+                                        Toast.LENGTH_LONG).show();
+                                Log.e("API_ERROR", "Update data failure", t);
+                            }
+                        });
+
                     } else {
                         try {
                             String errorMsg = "Erro ao alterar responsável";
@@ -354,6 +384,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                     Log.e("API_ERROR", "Network failure", t);
                 }
             });
+
         } catch (Exception e) {
             Toast.makeText(this,
                     "Erro inesperado: " + e.getMessage(),
@@ -361,6 +392,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             Log.e("API_ERROR", "Unexpected error", e);
         }
     }
+
 
     private void finishWithClientRefresh() {
         ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
@@ -422,6 +454,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                                     Toast.makeText(OportunidadeDetailActivity.this,
                                             "Oportunidade ganha e dados atualizados com sucesso",
                                             Toast.LENGTH_SHORT).show();
+                                    setResult(RESULT_OK);
                                     finishWithClientRefresh();
                                 } else {
                                     handleUpdateError(response);
@@ -478,7 +511,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                     Toast.makeText(this, "Por favor, informe o motivo da perda", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                setResult(RESULT_OK);
                 executeLostOpportunityCall(motivoPerda);
             });
             builder.setNegativeButton("Cancelar", null);
@@ -527,6 +560,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
                                 Toast.makeText(OportunidadeDetailActivity.this,
                                         "Oportunidade marcada como perdida e dados atualizados",
                                         Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
                                 finishWithClientRefresh();
                             } else {
                                 handleUpdateError(response);
@@ -667,6 +701,56 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
             Toast.makeText(OportunidadeDetailActivity.this,
                     "Erro ao processar resposta de atualização",
                     Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String formatarTelefone(String telefoneOriginal) {
+        try {
+            String telefone = telefoneOriginal.replaceAll("[^+0-9]", "");
+
+            // Verifica se o telefone tem o formato esperado (+55...)
+            if (!telefone.startsWith("+55") || telefone.length() < 12) {
+                return telefoneOriginal;
+            }
+
+            String codigoPais = telefone.substring(0, 3); // +55
+            String codigoArea = telefone.substring(3, 5);  // 11
+            String numero = telefone.substring(5);         // resto do número
+
+            // Formata baseado no tamanho do número
+            if (numero.length() == 8) {
+                return String.format("%s (%s) %s-%s",
+                        codigoPais,
+                        codigoArea,
+                        numero.substring(0, 4),
+                        numero.substring(4));
+            } else if (numero.length() == 9) {
+                return String.format("%s (%s) %s-%s",
+                        codigoPais,
+                        codigoArea,
+                        numero.substring(0, 5),
+                        numero.substring(5));
+            } else {
+                // Formato não reconhecido
+                return telefoneOriginal;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return telefoneOriginal;
+        }
+    }
+
+    private String formatarDataNascimento(String dataNascimentoOriginal) {
+        try {
+            SimpleDateFormat formatoEntrada = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+            SimpleDateFormat formatoSaida = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+
+            return formatoSaida.format(formatoEntrada.parse(dataNascimentoOriginal));
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return dataNascimentoOriginal;
         }
     }
 

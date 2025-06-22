@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.commercial_monitoring_app.model.Agendamento;
 import com.example.commercial_monitoring_app.model.Client;
 import com.example.commercial_monitoring_app.model.NavigationResponse;
 import com.example.commercial_monitoring_app.model.Oportunidade;
@@ -27,6 +28,7 @@ public class MyApp extends Application {
     private static Context context;
     private static List<Client> clientList = new ArrayList<>();
     private static List<Oportunidade> oportunidadeList = new ArrayList<>();
+    private static List<Agendamento> agendamentoList = new ArrayList<>();
     private static List<PersonalData> personalDataList = new ArrayList<>();
 
     private static List<Responsavel> responsaveisList = new ArrayList<>();
@@ -68,12 +70,17 @@ public class MyApp extends Application {
         return oportunidadeList != null ? oportunidadeList : new ArrayList<>();
     }
 
+    public static List<Agendamento> getAgendamentoList() {
+        return agendamentoList != null ? agendamentoList : new ArrayList<>();
+    }
+
+
     public static List<PersonalData> getPersonalDataList() {
         return personalDataList != null ? personalDataList : new ArrayList<>();
     }
 
-    public void setOportunidadesList(List<Oportunidade> newList) {
-        this.oportunidadeList = newList != null ? newList : new ArrayList<>();
+    public static void setOportunidadesList(List<Oportunidade> newList) {
+        oportunidadeList = newList != null ? newList : new ArrayList<>();
     }
 
     public static void setPersonalDataList(List<PersonalData> list) {
@@ -99,6 +106,34 @@ public class MyApp extends Application {
 
             @Override
             public void onFailure(Call<ResponseWrapper<Oportunidade>> call, Throwable t) {
+                Log.e("API_FAILURE", "Erro: ", t);
+                showToast("Erro de rede: " + t.getMessage());
+                if (callback != null) {
+                    callback.onFailure(call, t);
+                }
+            }
+        });
+    }
+
+    public static void fetchAgendamentoFromApi(Callback<ResponseWrapper<Agendamento>> callback, ApiService apiService) {
+        Call<ResponseWrapper<Agendamento>> call = apiService.listarAgendamentos();
+
+        call.enqueue(new Callback<ResponseWrapper<Agendamento>>() {
+            @Override
+            public void onResponse(Call<ResponseWrapper<Agendamento>> call, Response<ResponseWrapper<Agendamento>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
+                    agendamentoList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
+                    Log.d("API", "Agendamentos carregados: " + agendamentoList.size());
+                } else {
+                    logAndShowError("Erro na API: " + response.code(), response);
+                }
+                if (callback != null) {
+                    callback.onResponse(call, response);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseWrapper<Agendamento>> call, Throwable t) {
                 Log.e("API_FAILURE", "Erro: ", t);
                 showToast("Erro de rede: " + t.getMessage());
                 if (callback != null) {

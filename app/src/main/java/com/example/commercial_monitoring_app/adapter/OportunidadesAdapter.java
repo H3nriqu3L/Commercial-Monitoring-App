@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,28 +33,21 @@ import java.util.Optional;
 public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdapter.OportunidadeViewHolder> {
 
     private List<Oportunidade> oportunidades;
-    private OnDeleteClickListener deleteListener;
+    private ActivityResultLauncher<Intent> activityLauncher;
 
-    public interface OnDeleteClickListener {
-        void onDeleteClick(int position, Oportunidade oportunidade);
-    }
 
-    public OportunidadesAdapter(List<Oportunidade> oportunidades, OnDeleteClickListener deleteListener) {
+    public OportunidadesAdapter(List<Oportunidade> oportunidades, ActivityResultLauncher<Intent> launcher) {
         this.oportunidades = oportunidades;
-        this.deleteListener = deleteListener;
+        this.activityLauncher = launcher;
     }
 
-    public OportunidadesAdapter(List<Oportunidade> oportunidades) {
-        this.oportunidades = oportunidades;
-        this.deleteListener = null;
-    }
 
     public static class OportunidadeViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         TextView subtitle;
         TextView etapaStatus;
         TextView responsavelName;
-        // ImageView deleteIcon; // Commented out - delete icon removed from layout
+
 
         public OportunidadeViewHolder(View itemView) {
             super(itemView);
@@ -61,7 +55,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
             subtitle = itemView.findViewById(R.id.oportunidadeSubtitle);
             etapaStatus = itemView.findViewById(R.id.oportunidadeEtapaStatus);
             responsavelName = itemView.findViewById(R.id.responsavelCard);
-            // deleteIcon = itemView.findViewById(R.id.deleteOportunidadeIcon); // Commented out - ID doesn't exist
+
         }
     }
 
@@ -79,11 +73,14 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
 
         String etapaNome = oportunidade.getEtapaNome();
         String responsavelNome = "Sem Responsável";
+        String cursoNome = "Curso Ausente";
 
         if(oportunidade.getResponsavelNome()!=null){
             responsavelNome = oportunidade.getResponsavelNome();
         }
-
+        if(oportunidade.getCursoNome()!=null){
+            cursoNome = "Curso: " + oportunidade.getCursoNome();
+        }
 
 
         holder.title.setText(oportunidade.getPessoaNome());
@@ -92,42 +89,43 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
         holder.responsavelName.setText(responsavelNome);
 
 
+
         // Define a cor do texto baseado na etapa
         switch (etapaNome) {
             case "Potencial":
                 // Azul claro mais escuro - Interesse Inicial
                 holder.etapaStatus.setTextColor(Color.parseColor("#7CBCE4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Interessado":
                 // Azul médio - Usuário Curioso
                 holder.etapaStatus.setTextColor(Color.parseColor("#5DA9D4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Inscrito parcial":
                 // Azul-esverdeado - Usuário Engajado
                 holder.etapaStatus.setTextColor(Color.parseColor("#76C1D4"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Inscrito":
                 // Verde-água - Usuário Recorrente
                 holder.etapaStatus.setTextColor(Color.parseColor("#4FB8A8"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Convocado":
                 // Verde médio - Usuário Qualificado
                 holder.etapaStatus.setTextColor(Color.parseColor("#3DAA76"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Confirmado":
                 // Verde intenso - Usuário Quase Confirmado
                 holder.etapaStatus.setTextColor(Color.parseColor("#2E8B57"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
             case "Matriculado":
                 // Verde escuro - Usuário Confirmado
                 holder.etapaStatus.setTextColor(Color.parseColor("#1E6439"));
-                holder.subtitle.setText("Curso: " + oportunidade.getCursoNome());
+                holder.subtitle.setText(cursoNome);
                 break;
 
 
@@ -199,7 +197,7 @@ public class OportunidadesAdapter extends RecyclerView.Adapter<OportunidadesAdap
                 intent.putExtra("client_cep", cliente.getCep());
                 intent.putExtra("client_image", imagem);
             }
-            context.startActivity(intent);
+            activityLauncher.launch(intent);
         });
 
     }
