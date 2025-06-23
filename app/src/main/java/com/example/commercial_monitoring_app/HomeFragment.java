@@ -1,6 +1,8 @@
 // HomeFragment.java
 package com.example.commercial_monitoring_app;
 
+import static com.example.commercial_monitoring_app.MyApp.getOportunidadeList;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +49,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -62,6 +66,7 @@ public class HomeFragment extends Fragment {
     private List<Agendamento> agendamentoList;
     private List<Agendamento> filteredAgendamento;
     private ActivityResultLauncher<Intent> homeDetailLauncher;
+    private String currentFilter = "all";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -101,6 +106,59 @@ public class HomeFragment extends Fragment {
         oportunidadesGanhas = view.findViewById(R.id.oportunidadesGanhas);
         oportunidadesAbertas = view.findViewById(R.id.oportunidadesAbertas);
         recyclerView = view.findViewById(R.id.atividadesRecyclerView);
+        ImageView filterIcon = view.findViewById(R.id.filterIconHome);
+
+        filterIcon.setOnClickListener(v -> showFilterMenu(v));
+    }
+
+    private void showFilterMenu(View view) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
+
+
+        popup.getMenuInflater().inflate(R.menu.filter_menu_home, popup.getMenu());
+
+
+        popup.setOnMenuItemClickListener(item -> {
+            int itemId = item.getItemId();
+
+
+            if (itemId == R.id.filter_all) {
+                applyFilter("all");
+                return true;
+            } else if (itemId == R.id.filter_mine) {
+                applyFilter("mine");
+                return true;
+            }
+
+            return false;
+        });
+
+        popup.show();
+    }
+
+    private void applyFilter(String filter) {
+        currentFilter = filter;
+        List<Agendamento> newFilteredList = new ArrayList<>();
+        UserSession session = UserSession.getInstance(getContext());
+
+
+        for (Agendamento agendamento : filteredAgendamento) {
+
+            switch (currentFilter) {
+                case "all":
+                    newFilteredList = agendamentoList;
+                    break;
+                case "mine":
+                    if (agendamento.getResponsavel() != null && agendamento.getResponsavelNome().equals(session.getUserName())) {
+                        newFilteredList.add(agendamento);
+                    }
+                    break;
+            }
+
+        }
+        filteredAgendamento = newFilteredList;
+        agendamentoAdapter.updateData(filteredAgendamento);
+
     }
 
     private void setupRecyclerView() {
@@ -135,7 +193,8 @@ public class HomeFragment extends Fragment {
 
     private void loadOportunidadesAbertas() {
         // Procura quantidade oportunidades abertas na API e seta valor
-        oportunidadesAbertas.setText("13");
+        String aux = String.valueOf(MyApp.getOportunidadeList().size());
+        oportunidadesAbertas.setText(aux);
     }
 
     public void refreshAtividades() {
