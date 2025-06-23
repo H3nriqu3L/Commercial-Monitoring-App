@@ -10,4 +10,12 @@
     <color name="colorDefault">#cce3e4</color>
     <color name="colorDetailInfo">#4D6C73</color>
     <color name="floatButtonColor">#0ca4a5</color>
+    <color name="light_blue">#7CBCE4</color>
+    <color name="medium_blue">#5DA9D4</color>
+    <color name="blue_teal">#76C1D4</color>
+    <color name="teal_green">#4FB8A8</color>
+    <color name="medium_green">#3DAA76</color>
+    <color name="sea_green">#2E8B57</color>
+    <color name="dark_green">#1E6439</color>
+
 </resources>
