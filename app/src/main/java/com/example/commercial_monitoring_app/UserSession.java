@@ -43,6 +43,10 @@ public class UserSession {
         return prefs.getString(KEY_USER_EMAIL, null);
     }
 
+    public int getUserID() {
+        return prefs.getInt(KEY_USER_ID, 0);
+    }
+
     public String getUserName() {
         return prefs.getString(KEY_USER_NAME, null);
     }

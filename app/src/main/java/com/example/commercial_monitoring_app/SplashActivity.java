@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
 import com.example.commercial_monitoring_app.model.Agendamento;
@@ -13,6 +14,7 @@ import com.example.commercial_monitoring_app.network.ApiService;
 import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.RetrofitClient;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -75,6 +77,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, apiService);
 
+
+
         MyApp.fetchAgendamentoFromApi(new Callback<ResponseWrapper<Agendamento>>() {
             @Override
             public void onResponse(Call<ResponseWrapper<Agendamento>> call, Response<ResponseWrapper<Agendamento>> response) {
@@ -89,7 +93,14 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, apiService);
 
-        MyApp.fetchClientesFromApi(apiService);
+        MyApp.fetchClientesFromApi(apiService, () -> {
+            runOnUiThread(MyApp::notifyClientsReady);
+            MyApp.fetchTodasOportunidadesFromApi(() -> {
+                List<Oportunidade> todas = MyApp.getTodasOportunidadesList();
+                Log.d("RESULTADO_FINAL", "Total de oportunidades carregadas: " + todas.size());
+            });
+        });
+
         MyApp.fetchPersonalDataFromApi(apiService);
 
         try {

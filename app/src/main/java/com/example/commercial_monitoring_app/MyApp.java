@@ -15,19 +15,57 @@ import com.example.commercial_monitoring_app.network.ApiService;
 import com.example.commercial_monitoring_app.network.PersonalDataResponse;
 import com.example.commercial_monitoring_app.network.ResponseWrapper;
 import com.example.commercial_monitoring_app.network.ResponseWrapper2;
+import com.example.commercial_monitoring_app.network.RetrofitClient;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MyApp extends Application {
+    private static Runnable onClientsReadyCallback;
+    private static Runnable onTodasOportunidadesReadyCallback;
+
+
+    public static void setOnClientsReadyCallback(Runnable callback) {
+        onClientsReadyCallback = callback;
+    }
+
+    public static void notifyClientsReady() {
+        if (onClientsReadyCallback != null) {
+            onClientsReadyCallback.run();
+        }
+    }
+
+    public static void setOnTodasOportunidadesReadyCallback(Runnable callback) {
+        onTodasOportunidadesReadyCallback = callback;
+
+        // if already loaded, trigger immediately
+        if (todasOportunidadesList != null && !todasOportunidadesList.isEmpty()) {
+            callback.run();
+        }
+    }
+
+    public static void notifyTodasOportunidadesReady() {
+        if (onTodasOportunidadesReadyCallback != null) {
+            onTodasOportunidadesReadyCallback.run();
+        }
+    }
+
     private static Context context;
     private static List<Client> clientList = new ArrayList<>();
     private static List<Oportunidade> oportunidadeList = new ArrayList<>();
+
+    private static List<Oportunidade> todasOportunidadesList = new ArrayList<>();
+
     private static List<Agendamento> agendamentoList = new ArrayList<>();
     private static List<PersonalData> personalDataList = new ArrayList<>();
 
@@ -39,12 +77,22 @@ public class MyApp extends Application {
 
     private static UserSession userSession;
 
+    public static ApiService getApiService() {
+        if (apiService == null) {
+            apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+        }
+        return apiService;
+    }
+
+
 
     @Override
     public void onCreate() {
         super.onCreate();
         context = getApplicationContext();
         userSession =  UserSession.getInstance(context);
+        apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+
     }
 
     public static UserSession getUserSession() {
@@ -68,6 +116,14 @@ public class MyApp extends Application {
 
     public static List<Oportunidade> getOportunidadeList() {
         return oportunidadeList != null ? oportunidadeList : new ArrayList<>();
+    }
+
+    public static List<Oportunidade> getTodasOportunidadesList() {
+        return todasOportunidadesList != null ? todasOportunidadesList : new ArrayList<>();
+    }
+
+    public static void setTodasOportunidadesList(List<Oportunidade> list) {
+        todasOportunidadesList = list != null ? list : new ArrayList<>();
     }
 
     public static List<Agendamento> getAgendamentoList() {
@@ -114,6 +170,106 @@ public class MyApp extends Application {
             }
         });
     }
+
+    public static void fetchTodasOportunidadesFromApi(Runnable onComplete) {
+        try {
+            List<Client> clients = getClientList();
+            int totalClients = clients.size();
+
+            if (totalClients == 0) {
+                setTodasOportunidadesList(new ArrayList<>());
+                if (onComplete != null) onComplete.run();
+                return;
+            }
+
+            List<Oportunidade> allOportunidades = new ArrayList<>();
+            final int[] responsesReceived = {0};
+
+            for (Client client : clients) {
+                int clientId = client.getId();
+
+                Call<ResponseBody> call = getApiService().getNavegacaoInternaUsuario(clientId);
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                String rawJson = response.body().string();
+                                JSONObject root = new JSONObject(rawJson);
+                                JSONObject dadosPessoaWrapper = root.optJSONObject("dadosPessoa");
+
+                                if (dadosPessoaWrapper != null && dadosPessoaWrapper.optBoolean("success")) {
+                                    JSONObject dadosPessoa = dadosPessoaWrapper.optJSONObject("dados");
+                                    if (dadosPessoa != null) {
+                                        JSONArray processos = dadosPessoa.optJSONArray("processos");
+                                        if (processos != null) {
+                                            for (int i = 0; i < processos.length(); i++) {
+                                                JSONObject processo = processos.getJSONObject(i);
+                                                JSONArray oportunidades = processo.optJSONArray("oportunidades");
+
+                                                if (oportunidades != null) {
+                                                    for (int j = 0; j < oportunidades.length(); j++) {
+                                                        JSONObject oportunidadeJson = oportunidades.getJSONObject(j);
+
+                                                        Oportunidade oportunidade = new Oportunidade();
+                                                        try {
+                                                            Field statusField = Oportunidade.class.getDeclaredField("status");
+                                                            statusField.setAccessible(true);
+                                                            statusField.set(oportunidade, oportunidadeJson.optString("status"));
+
+                                                            Field respField = Oportunidade.class.getDeclaredField("responsavelNome");
+                                                            respField.setAccessible(true);
+                                                            respField.set(oportunidade, oportunidadeJson.optString("responsavel"));
+
+                                                            Field idField = Oportunidade.class.getDeclaredField("id");
+                                                            idField.setAccessible(true);
+                                                            idField.set(oportunidade, oportunidadeJson.optString("id"));
+                                                        } catch (Exception reflectionError) {
+                                                            Log.e("REFLECTION_ERROR", "Erro setando campos em Oportunidade", reflectionError);
+                                                        }
+
+                                                        allOportunidades.add(oportunidade);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                                Log.e("PARSE_ERROR", "Erro ao parsear JSON para clientId " + clientId, e);
+                            }
+                        } else {
+                            Log.e("API_ERROR", "Erro HTTP para clientId " + clientId + ": código " + response.code());
+                        }
+
+                        responsesReceived[0]++;
+                        if (responsesReceived[0] == totalClients) {
+                            setTodasOportunidadesList(allOportunidades);
+                            Log.d("TODAS_OPORTS", "Total carregadas: " + allOportunidades.size());
+                            if (onComplete != null) onComplete.run();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e("NAV_FAILURE", "Erro de rede para clientId " + clientId, t);
+                        responsesReceived[0]++;
+                        if (responsesReceived[0] == totalClients) {
+                            setTodasOportunidadesList(allOportunidades);
+                            if (onComplete != null) onComplete.run();
+                        }
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            Log.e("FETCH_ALL_OPORTS_ERROR", "Erro inesperado ao buscar oportunidades", e);
+            if (onComplete != null) onComplete.run();
+        }
+    }
+
 
     public static void fetchAgendamentoFromApi(Callback<ResponseWrapper<Agendamento>> callback, ApiService apiService) {
         Call<ResponseWrapper<Agendamento>> call = apiService.listarAgendamentos();
@@ -279,7 +435,7 @@ public class MyApp extends Application {
 //        });
     }
 
-    public static void fetchClientesFromApi( ApiService apiService) {
+    public static void fetchClientesFromApi(ApiService apiService, Runnable onComplete) {
         Call<ResponseWrapper<Client>> call = apiService.listarPessoas();
 
         call.enqueue(new Callback<ResponseWrapper<Client>>() {
@@ -291,15 +447,18 @@ public class MyApp extends Application {
                 } else {
                     logAndShowError("Erro na API (clientes): " + response.code(), response);
                 }
+                if (onComplete != null) onComplete.run();
             }
 
             @Override
             public void onFailure(Call<ResponseWrapper<Client>> call, Throwable t) {
                 Log.e("API_FAILURE", "Erro ao buscar clientes: ", t);
                 showToast("Erro de rede ao buscar clientes: " + t.getMessage());
+                if (onComplete != null) onComplete.run();
             }
         });
     }
+
 
     public static void fetchPersonalDataFromApi(ApiService apiService) {
         Call<PersonalDataResponse> call = apiService.searchPersonalData();

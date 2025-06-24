@@ -34,6 +34,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private TextView headerTitle;
     private FloatingActionButton mainFab;
+    private HomeFragment homeFragment;
     private ActivityResultLauncher<Intent> addClientLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -60,50 +61,75 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
         mainFab = findViewById(R.id.main_fab);
 
+        homeFragment = new HomeFragment();
+
+
+
         // Home default
-        replaceFragment(new HomeFragment());
         headerTitle.setText(R.string.home);
 
-        bottomNavigation.setOnItemSelectedListener(item ->{
+        addClientLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                        if (currentFragment instanceof OportunidadesFragment) {
+                            ((OportunidadesFragment) currentFragment).refreshOportunidades();
+                        } else if (currentFragment instanceof ClientsFragment) {
+                            ((ClientsFragment) currentFragment).refreshClientsList();
+                        } else if (currentFragment instanceof HomeFragment) {
+                            ((HomeFragment) currentFragment).refreshAtividades();
+                        }
+                    }
+                });
+
+        bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
 
             if (id == R.id.page_home) {
-                replaceFragment(new HomeFragment());
+                replaceFragment(homeFragment, "HOME_TAG");
                 headerTitle.setText(R.string.home);
                 mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_clients) {
-                replaceFragment(new OportunidadesFragment());
+                replaceFragment(new OportunidadesFragment(), "OPO_TAG");
                 headerTitle.setText(R.string.oportunidades);
                 mainFab.setVisibility(View.VISIBLE);
                 return true;
             } else if (id == R.id.page_insights) {
-                replaceFragment(new LeadsFragment());
+                replaceFragment(new LeadsFragment(), "LEADS_TAG");
                 headerTitle.setText(R.string.insights);
                 mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_profile) {
-                replaceFragment(new PerfilFragment());
+                replaceFragment(new PerfilFragment(), "PROFILE_TAG");
                 headerTitle.setText(R.string.perfil);
                 mainFab.setVisibility(View.GONE);
                 return true;
             }
+
             return false;
         });
 
-        // FAB click listener
+
         mainFab.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddClientActivity.class);
             addClientLauncher.launch(intent);
         });
 
 
-    }
-
-    private void replaceFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+                .replace(R.id.fragment_container, new HomeFragment(), "HOME_TAG")
+                .commit();
+
+
+    }
+
+    private void replaceFragment(Fragment fragment, String tag) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment, tag)
                 .commit();
     }
 
