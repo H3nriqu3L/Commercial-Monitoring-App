@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.page_clients) {
                 replaceFragment(new OportunidadesFragment(), "OPO_TAG");
                 headerTitle.setText(R.string.oportunidades);
-                mainFab.setVisibility(View.VISIBLE);
+                mainFab.setVisibility(View.GONE);
                 return true;
             } else if (id == R.id.page_insights) {
                 replaceFragment(new LeadsFragment(), "LEADS_TAG");

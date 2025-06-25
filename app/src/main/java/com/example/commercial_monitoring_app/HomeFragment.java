@@ -209,6 +209,10 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadOportunidadesGanhas() {
+        if (MyApp.getCountOportunidadesGanhas()!=-1){
+            oportunidadesGanhas.setText(String.valueOf(MyApp.getCountOportunidadesGanhas()));
+            return;
+        }
         try {
             List<Client> clients = MyApp.getClientList();
             int totalClients = clients.size();
@@ -278,6 +282,7 @@ public class HomeFragment extends Fragment {
                         responsesReceived[0]++;
                         if (responsesReceived[0] == totalClients) {
                             oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
+                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
                         }
                     }
 
@@ -287,6 +292,7 @@ public class HomeFragment extends Fragment {
                         responsesReceived[0]++;
                         if (responsesReceived[0] == totalClients) {
                             oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
+                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
                         }
                     }
                 });
