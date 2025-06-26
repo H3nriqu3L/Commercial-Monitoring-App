@@ -19,52 +19,64 @@
             android:orientation="vertical">
 
             <!-- Toolbar -->
-            <RelativeLayout
+            <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/header_layout"
                 android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:background="#cce3e4">
+                android:layout_height="65dp"
+                android:paddingStart="4dp"
+                android:paddingEnd="12dp"
+                android:background="#cce3e4"
+                android:elevation="4dp">
 
                 <ImageView
                     android:id="@+id/menu_icon"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:src="@drawable/arrow_back"
                     android:scaleType="centerInside"
-                    android:padding="8dp"
+                    android:padding="12dp"
                     android:clickable="true"
                     android:focusable="true"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Retornar"
-                    android:onClick="navigateBack" />
-
-                <ImageView
-                    android:id="@+id/header_image"
-                    android:layout_width="64dp"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/cropped_logo_rubeus"
-                    android:scaleType="centerInside"
-                    android:layout_alignParentEnd="true" />
+                    android:onClick="navigateBack"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
                 <TextView
                     android:id="@+id/header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:clickable="true"
                     android:focusable="true"
-                    android:textSize="14sp"
+                    android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#000000"
                     android:text="Detalhes do Cliente"
-                    android:layout_centerInParent="true" />
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    app:layout_constraintStart_toEndOf="@id/menu_icon"
+                    app:layout_constraintEnd_toStartOf="@id/header_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-            </RelativeLayout>
+                <ImageView
+                    android:id="@+id/header_image"
+                    android:layout_width="56dp"
+                    android:layout_height="0dp"
+                    android:src="@drawable/cropped_logo_rubeus"
+                    android:scaleType="centerInside"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:orientation="vertical"

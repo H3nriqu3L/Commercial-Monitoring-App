@@ -18,6 +18,7 @@
     <color name="medium_green">#3DAA76</color>
     <color name="sea_green">#2E8B57</color>
     <color name="dark_green">#1E6439</color>
+    <color name="header_text_color">#000000</color>
 
     <!-- Text colors -->
     <color name="primary_text">#1a1a1a</color>
