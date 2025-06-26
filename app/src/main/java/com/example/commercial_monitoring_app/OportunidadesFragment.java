@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.commercial_monitoring_app.adapter.OportunidadesAdapter;
 import com.example.commercial_monitoring_app.database.DatabaseHelper;
+import com.example.commercial_monitoring_app.model.NavigationResponse;
 import com.example.commercial_monitoring_app.model.Oportunidade;
 import com.example.commercial_monitoring_app.network.ApiService;
 import com.example.commercial_monitoring_app.network.ResponseWrapper;
@@ -56,6 +57,8 @@ public class OportunidadesFragment extends Fragment {
     private SearchView searchView;
     private TabLayout tabLayout;
     private String currentTab = "captacao"; // "captacao" ou "acompanhamento"
+    private boolean showOnlyMine = false;
+    private UserSession session;
 
     private ActivityResultLauncher<Intent> oportunidadeDetailLauncher;
 
@@ -117,6 +120,7 @@ public class OportunidadesFragment extends Fragment {
             Log.e("OportunidadesFragment", "SearchView not found in layout");
         }
 
+        session = UserSession.getInstance(getContext());
         // Apply initial filter
         applyFiltersAndSearch();
     }
@@ -186,6 +190,11 @@ public class OportunidadesFragment extends Fragment {
             popup.getMenuInflater().inflate(R.menu.filter_menu_captacao, popup.getMenu());
         }
 
+        MenuItem mineItem = popup.getMenu().findItem(R.id.filter_mine);
+        if (mineItem != null) {
+            mineItem.setChecked(showOnlyMine);
+        }
+
         popup.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
 
@@ -205,6 +214,9 @@ public class OportunidadesFragment extends Fragment {
                 } else if (itemId == R.id.filter_regulares) {
                     applyFilter("regulares");
                     return true;
+                }else if (itemId == R.id.filter_mine) {
+                    applyFilter("mine");
+
                 }
             }
             // Filtros para Captação
@@ -230,6 +242,9 @@ public class OportunidadesFragment extends Fragment {
                 } else if (itemId == R.id.filter_matriculado) {
                     applyFilter("matriculado");
                     return true;
+                } else if (itemId == R.id.filter_mine) {
+                    applyFilter("mine");
+
                 }
             }
 
@@ -272,6 +287,10 @@ public class OportunidadesFragment extends Fragment {
                                 specificFilteredList.add(oportunidade);
                             }
                             break;
+                        case "mine":
+                            if(oportunidade.getResponsavelNome().equals(session.getUserName())){
+                                specificFilteredList.add(oportunidade);
+                            }
                     }
                 } else {
                     // Filtros para Captação
@@ -311,11 +330,26 @@ public class OportunidadesFragment extends Fragment {
                                 specificFilteredList.add(oportunidade);
                             }
                             break;
+                        case "mine":
+                            if(oportunidade.getResponsavelNome().equals(session.getUserName())){
+                                specificFilteredList.add(oportunidade);
+                            }
                     }
                 }
             }
             newFilteredList = specificFilteredList;
 
+        }
+
+        if (showOnlyMine) {
+            List<Oportunidade> mineFilteredList = new ArrayList<>();
+            for (Oportunidade oportunidade : newFilteredList) {
+                if (oportunidade.getResponsavelNome() != null &&
+                        oportunidade.getResponsavelNome().equals(session.getUserName())) {
+                    mineFilteredList.add(oportunidade);
+                }
+            }
+            newFilteredList = mineFilteredList;
         }
 
         // Por último aplica o filtro de busca
@@ -362,7 +396,14 @@ public class OportunidadesFragment extends Fragment {
     }
 
     private void applyFilter(String filterType) {
-        currentFilter = filterType;
+        if (filterType.equals("mine")) {
+            showOnlyMine = !showOnlyMine; // Toggle o filtro mine
+        } else {
+            currentFilter = filterType;
+            if (!filterType.equals("all")) {
+                showOnlyMine = false;
+            }
+        }
         applyFiltersAndSearch();
     }
 

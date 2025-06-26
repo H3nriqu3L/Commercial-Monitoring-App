@@ -28,6 +28,7 @@ import com.example.commercial_monitoring_app.model.PersonalData;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -72,16 +73,28 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
     public void onBindViewHolder(AgendamentoAdapter.AgendamentoViewHolder holder, int position) {
         Agendamento agendamento = agendamentoList.get(position);
 
-
         holder.atividadeTitle.setText(agendamento.getContato());
         holder.atividadeCliente.setText(agendamento.getPessoaNome());
         holder.atividadeData.setText(formatarData(agendamento.getVencimento()));
         holder.atividadeResponsavel.setText(agendamento.getResponsavelNome());
 
-
+        // Verificar status da data e aplicar cor correspondente
+        int statusData = getStatusData(agendamento.getVencimento());
+        switch (statusData) {
+            case 0: // Atrasada
+                holder.atividadeData.setTextColor(Color.RED);
+                break;
+            case 1: // Esta semana
+                holder.atividadeData.setTextColor(Color.rgb(255, 165, 0)); // Amarelo/laranja
+                break;
+            case 2: // Mais tempo
+                holder.atividadeData.setTextColor(Color.rgb(0, 150, 0)); // verde
+                break;
+            default:
+                holder.atividadeData.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.black));
+        }
 
         holder.itemView.setOnClickListener(v -> {
-
             Context context = v.getContext();
             Intent intent = new Intent(context, AtividadeDetailActivity.class);
             intent.putExtra("atividade", agendamento.getContato());
@@ -94,10 +107,8 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
             intent.putExtra("cliente_email", agendamento.getEmail());
             intent.putExtra("atividade_id", agendamento.getId());
 
-
             activityLauncher.launch(intent);
         });
-
     }
 
     @Override
@@ -120,6 +131,35 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
         }
     }
 
+    private int getStatusData(String dataVencimento) {
+        try {
+            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date dataVenc = formato.parse(dataVencimento);
+            Date dataAtual = new Date();
+
+            if (dataVenc == null) return -1;
+
+            // Se está atrasada
+            if (dataVenc.before(dataAtual)) {
+                return 0; // Vermelho
+            }
+
+            long diferencaMs = dataVenc.getTime() - dataAtual.getTime();
+            long diasDiferenca = diferencaMs / (1000 * 60 * 60 * 24);
+
+            // Se vence em até 7 dias
+            if (diasDiferenca <= 7) {
+                return 1; // Amarelo
+            }
+
+            // Se vence em mais de 7 dias
+            return 2; // Verde
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
     public void updateData(List<Agendamento> newList) {
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(new AgendamentoAdapter.AgendamentoDiffCallback(this.agendamentoList, newList));
         this.agendamentoList.clear();
