@@ -19,6 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,85 +163,45 @@ public class MainActivity extends AppCompatActivity {
             vendedorNome.setText("Nome não disponível");
         }
 
-
-        int width = (int) (screenWidth * 0.65); // x% of screen width
+        int width = (int) (screenWidth * 0.85); // x% of screen width
         int height = ViewGroup.LayoutParams.MATCH_PARENT;
         boolean focusable = true;
 
         final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
-        //popupWindow.setAnimationStyle(android.R.style.Animation_Dialog);
         popupWindow.setAnimationStyle(R.style.PopupAnimation);
 
         View headerView = findViewById(R.id.header_include);
-
         popupWindow.showAsDropDown(headerView, 0, 0, Gravity.START);
 
+        View.OnTouchListener swipeListener = createSwipeListener(popupWindow);
+
+
         View rootView = popupView.findViewById(R.id.popup_container);
+        rootView.setOnTouchListener(swipeListener);
 
-        // Track touch movement for manual swipe detection
-        final float[] startX = new float[1];
-        final float[] startY = new float[1];
-
-        rootView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        // Record initial touch position
-                        startX[0] = event.getX();
-                        startY[0] = event.getY();
-                        return true;
-
-                    case MotionEvent.ACTION_MOVE:
-                        // Calculate distance moved
-                        float currentX = event.getX();
-                        float currentY = event.getY();
-                        float deltaX = currentX - startX[0];
-                        float deltaY = currentY - startY[0];
-
-                        // If horizontal movement is greater than vertical and is leftward
-                        if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < -50) {
-                            // User is swiping left, dismiss the popup
-                            popupWindow.dismiss();
-                            return true;
-                        }
-                        return true;
-
-                    case MotionEvent.ACTION_UP:
-                        // Reset values
-                        startX[0] = 0;
-                        startY[0] = 0;
-                        return true;
-                }
-                return false;
-            }
-        });
-
-
+        ScrollView scrollView = popupView.findViewById(R.id.menu_scroll_view); // Add this ID to ScrollView
+        if (scrollView != null) {
+            scrollView.setOnTouchListener(swipeListener);
+        }
 
         // Click examples
         LinearLayout item1 = popupView.findViewById(R.id.menu_item1);
         item1.setOnClickListener(v -> {
             popupWindow.dismiss();
-
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_profile);
         });
 
-
         LinearLayout item2 = popupView.findViewById(R.id.menu_item2);
         item2.setOnClickListener(v -> {
             popupWindow.dismiss();
-
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_clients);
-
         });
 
         LinearLayout item3 = popupView.findViewById(R.id.menu_item3);
         item3.setOnClickListener(v -> {
             popupWindow.dismiss();
-
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_insights);
         });
@@ -248,7 +209,6 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item4 = popupView.findViewById(R.id.menu_item4);
         item4.setOnClickListener(v -> {
             popupWindow.dismiss();
-
             BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
             bottomNavigation.setSelectedItemId(R.id.page_home);
         });
@@ -256,14 +216,56 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item5 = popupView.findViewById(R.id.menu_item5);
         item5.setOnClickListener(v -> {
             session.clearSession();
-
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
-
             finish();
-
             popupWindow.dismiss();
         });
+    }
+
+    private View.OnTouchListener createSwipeListener(PopupWindow popupWindow) {
+        return new View.OnTouchListener() {
+            private float startX = 0;
+            private float startY = 0;
+            private boolean isSwipeDetected = false;
+            private final float SWIPE_THRESHOLD = 100; // Minimum distance for swipe
+            private final float SWIPE_VELOCITY_THRESHOLD = 50; // Minimum velocity
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        startX = event.getX();
+                        startY = event.getY();
+                        isSwipeDetected = false;
+                        return false; // Don't consume the event yet
+
+                    case MotionEvent.ACTION_MOVE:
+                        float currentX = event.getX();
+                        float currentY = event.getY();
+                        float deltaX = currentX - startX;
+                        float deltaY = currentY - startY;
+
+                        // Check if this is a horizontal swipe to the left
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && deltaX < -SWIPE_THRESHOLD) {
+                            if (!isSwipeDetected) {
+                                isSwipeDetected = true;
+                                popupWindow.dismiss();
+                                return true; // Consume the event
+                            }
+                        }
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        startX = 0;
+                        startY = 0;
+                        isSwipeDetected = false;
+                        break;
+                }
+                return false; // Let other views handle the event if not a swipe
+            }
+        };
     }
 
 }

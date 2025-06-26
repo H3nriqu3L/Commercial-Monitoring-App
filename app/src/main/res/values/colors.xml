@@ -19,4 +19,29 @@
     <color name="sea_green">#2E8B57</color>
     <color name="dark_green">#1E6439</color>
 
+    <!-- Text colors -->
+    <color name="primary_text">#1a1a1a</color>
+    <color name="secondary_text">#666666</color>
+    <color name="menu_text">#2c3e50</color>
+    <color name="logout_text">#c0392b</color>
+
+    <!-- Icon colors -->
+    <color name="icon_tint">#4a90e2</color>
+    <color name="logout_icon_tint">#e74c3c</color>
+
+    <!-- Background colors -->
+    <color name="menu_background_start">#f8fafb</color>
+    <color name="menu_background_end">#e8f4f5</color>
+    <color name="profile_background_start">#ffffff</color>
+    <color name="profile_background_end">#f0f9fa</color>
+
+    <!-- Border colors -->
+    <color name="border_light">#e1e8ed</color>
+    <color name="border_blue">#e1eeff</color>
+    <color name="border_red">#ffe1e1</color>
+
+    <!-- Ripple effects -->
+    <color name="ripple_blue">#1a4a90e2</color>
+    <color name="ripple_red">#1aff4444</color>
+
 </resources>
