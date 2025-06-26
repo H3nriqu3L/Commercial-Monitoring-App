@@ -57,9 +57,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Oportunidades Abertas"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
                         android:textColor="#666666"
                         android:textAlignment="center" />
+
 
                 </LinearLayout>
 
@@ -70,6 +71,7 @@
                 android:layout_height="100dp"
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="#E8F5E8">
@@ -94,7 +96,44 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Oportunidades Ganhas"
-                        android:textSize="12sp"
+                        android:textSize="10sp"
+                        android:textColor="#666666"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="#FBEAEA">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="12dp">
+
+                    <TextView
+                        android:id="@+id/oportunidadesPerdidas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/red" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Oportunidades Perdidas"
+                        android:textSize="10sp"
                         android:textColor="#666666"
                         android:textAlignment="center" />
 

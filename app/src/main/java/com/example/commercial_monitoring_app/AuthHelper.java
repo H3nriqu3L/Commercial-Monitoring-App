@@ -65,7 +65,7 @@ public class AuthHelper {
         for (Responsavel responsavel : responsaveis) {
             for (NavigationResponse.User user : users) {
                 if (user.getEmail().equalsIgnoreCase(email)) {
-                    handleSuccessfulLogin(context, responsavel, users, user.getEmail(), user.getName());
+                    handleSuccessfulLogin(context, responsavel, users, user.getEmail(), user.getName(), user.getId());
                     return;
                 }
             }
@@ -73,10 +73,10 @@ public class AuthHelper {
         Toast.makeText(context, "Credenciais inválidas ou usuário não autorizado", Toast.LENGTH_SHORT).show();
     }
 
-    private static void handleSuccessfulLogin(Context context, Responsavel responsavel, List<NavigationResponse.User> users, String email, String nome) {
+    private static void handleSuccessfulLogin(Context context, Responsavel responsavel, List<NavigationResponse.User> users, String email, String nome, String id) {
         UserSession session = UserSession.getInstance(context);
-        session.saveUserSession(responsavel.id, email, nome);
-
+        session.saveUserSession(Integer.parseInt(id), email, nome);
+        Log.e("LOGIN_DATA", "Dados Login"+ email + nome + id);
         MyApp.setNavigationUsersList(users);
 
         Intent intent = new Intent(context, MainActivity.class);

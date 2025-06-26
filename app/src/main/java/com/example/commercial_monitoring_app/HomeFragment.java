@@ -66,6 +66,7 @@ import retrofit2.Response;
 public class HomeFragment extends Fragment {
 
     private TextView oportunidadesGanhas;
+    private TextView oportunidadesPerdidas;
     private TextView oportunidadesAbertas;
     private RecyclerView recyclerView;
     private AgendamentoAdapter agendamentoAdapter;
@@ -127,6 +128,7 @@ public class HomeFragment extends Fragment {
     private void initViews(View view) {
         oportunidadesGanhas = view.findViewById(R.id.oportunidadesGanhas);
         oportunidadesAbertas = view.findViewById(R.id.oportunidadesAbertas);
+        oportunidadesPerdidas = view.findViewById(R.id.oportunidadesPerdidas);
         recyclerView = view.findViewById(R.id.atividadesRecyclerView);
         ImageView filterIcon = view.findViewById(R.id.filterIconHome);
 
@@ -204,7 +206,8 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadData() {
-        loadOportunidadesGanhas();
+        //loadOportunidadesGanhas();
+        loadOportunidadesGanhasEPerdidas();
         loadOportunidadesAbertas();
     }
 
@@ -303,7 +306,117 @@ public class HomeFragment extends Fragment {
         }
     }
 
+    private void loadOportunidadesGanhasEPerdidas() {
+        if (MyApp.getCountOportunidadesGanhas()!=-1 || MyApp.getCountOportunidadesPerdidas()!=-1){
+            if (MyApp.getCountOportunidadesGanhas()!=-1) {
+                oportunidadesGanhas.setText(String.valueOf(MyApp.getCountOportunidadesGanhas()));
+            }
+            if (MyApp.getCountOportunidadesPerdidas()!=-1) {
+                oportunidadesPerdidas.setText(String.valueOf(MyApp.getCountOportunidadesPerdidas()));
+            }
 
+            return;
+        }
+
+        try {
+            List<Client> clients = MyApp.getClientList();
+            int totalClients = clients.size();
+
+            if (totalClients == 0) {
+                return;
+            }
+
+            List<Oportunidade> todasOportunidades = MyApp.getTodasOportunidadesList();
+
+            final int[] ganhoCount = {0};
+            final int [] lostCount = {0};
+            final int[] responsesReceived = {0};
+            UserSession session = UserSession.getInstance(MyApp.getAppContext());
+
+            String responsael_ID = String.valueOf(session.getUserID());
+
+
+            for (Client client : clients) {
+                int clientId = client.getId();
+
+                Call<ResponseBody> call = MyApp.getApiService().getNavegacaoInternaUsuario(clientId);
+
+                call.enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            try {
+                                String rawJson = response.body().string();
+                                Log.d("NAV_DEBUG", "Client ID " + clientId + ": " + rawJson);
+
+                                JSONObject root = new JSONObject(rawJson);
+                                JSONObject dadosPessoaWrapper = root.optJSONObject("dadosPessoa");
+
+                                if (dadosPessoaWrapper != null && dadosPessoaWrapper.optBoolean("success")) {
+                                    JSONObject dadosPessoa = dadosPessoaWrapper.optJSONObject("dados");
+                                    if (dadosPessoa != null) {
+                                        JSONArray processos = dadosPessoa.optJSONArray("processos");
+                                        if (processos != null) {
+                                            for (int i = 0; i < processos.length(); i++) {
+                                                JSONObject processo = processos.getJSONObject(i);
+                                                JSONArray oportunidades = processo.optJSONArray("oportunidades");
+
+                                                if (oportunidades != null) {
+                                                    for (int j = 0; j < oportunidades.length(); j++) {
+                                                        JSONObject oportunidade = oportunidades.getJSONObject(j);
+                                                        String status = oportunidade.optString("status");
+                                                        String responsavel = oportunidade.optString("responsavel");
+
+                                                        if ("2".equals(status) && responsael_ID.equals(responsavel)) {
+                                                            ganhoCount[0]++;
+                                                            Log.d("STATUS_MATCH", "Ganho encontrado para clientId " + clientId +  " consultoraresponsavel: " + responsavel + "eu: "+ responsael_ID);
+                                                        }
+                                                        if("3".equals(status)){
+                                                            lostCount[0]++;
+                                                            Log.d("STATUS_MATCH", "Lost encontrado para clientId " + clientId + " consultoraresponsavel: " + responsavel + "eu: "+ responsael_ID);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                            } catch (Exception e) {
+                                Log.e("PARSE_ERROR", "Erro ao parsear JSON para clientId " + clientId, e);
+                            }
+                        } else {
+                            Log.e("API_ERROR", "Erro HTTP para clientId " + clientId + ": código " + response.code());
+                        }
+
+                        responsesReceived[0]++;
+                        if (responsesReceived[0] == totalClients) {
+                            oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
+                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
+
+                            oportunidadesPerdidas.setText(String.valueOf(lostCount[0]));
+                            MyApp.setCountOportunidadesPerdidas(lostCount[0]);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Log.e("NAV_FAILURE", "Erro de rede para clientId " + clientId, t);
+                        responsesReceived[0]++;
+                        if (responsesReceived[0] == totalClients) {
+                            oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
+                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
+                            oportunidadesPerdidas.setText(String.valueOf(lostCount[0]));
+                            MyApp.setCountOportunidadesPerdidas(lostCount[0]);
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.e("LOAD_ERROR", "Erro inesperado", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     private void loadOportunidadesAbertas() {
         // Procura quantidade oportunidades abertas na API e seta valor

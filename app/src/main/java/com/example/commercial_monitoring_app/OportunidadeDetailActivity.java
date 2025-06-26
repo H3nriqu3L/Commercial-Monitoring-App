@@ -308,7 +308,9 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
     private void performClientAssignment() {
         try {
-            int userIdResponsavel = UserSession.getLoggedUserId();
+            UserSession session = UserSession.getInstance(OportunidadeDetailActivity.this);
+            int userIdResponsavel = session.getUserID();
+            Log.e("API_ASSIGN", "UserId: " + userIdResponsavel + "Usermail: " + session.getUserEmail());
 
             if (oportunidadeId == -1 || userIdResponsavel == -1 || clientId == null) {
                 Toast.makeText(this, "Dados inválidos para alteração de responsável", Toast.LENGTH_SHORT).show();

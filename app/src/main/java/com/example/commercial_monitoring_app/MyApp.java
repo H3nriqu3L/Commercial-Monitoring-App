@@ -72,6 +72,7 @@ public class MyApp extends Application {
     private static List<Responsavel> responsaveisList = new ArrayList<>();
     private static List<NavigationResponse.User> navigationUsersList = new ArrayList<>();
     private static int countOportunidadesGanhas = -1;
+    private static int countOportunidadesPerdidas = -1;
 
 
     private static ApiService apiService;
@@ -112,6 +113,13 @@ public class MyApp extends Application {
     public static void setCountOportunidadesGanhas(int count) {
         countOportunidadesGanhas = count;
     }
+
+    public static int getCountOportunidadesPerdidas(){return countOportunidadesPerdidas;}
+
+    public static void setCountOportunidadesPerdidas(int count) {
+        countOportunidadesPerdidas = count;
+    }
+
 
     public static void setClientList(List<Client> list) {
         clientList = list != null ? list : new ArrayList<>();

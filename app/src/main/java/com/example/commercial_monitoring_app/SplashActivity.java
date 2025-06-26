@@ -42,8 +42,9 @@ public class SplashActivity extends AppCompatActivity {
 
                 if (session.isLoggedIn()) {
                     String email = session.getUserEmail();
+                    String id = String.valueOf(session.getLoggedUserId());
 
-                    Log.d("SplashActivity", "Usuário logado. Verificando responsável e cliente...");
+                    Log.d("SplashActivity", "Usuário logado. Verificando responsável e cliente..." + email + id);
 
                     AuthHelper.verifyResponsavelAndClient(SplashActivity.this, email, apiService);
 
