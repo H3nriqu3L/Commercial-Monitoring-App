@@ -194,15 +194,6 @@
                     android:orientation="vertical"
                     android:layout_marginBottom="16dp">
 
-                    <!-- Subtítulo Captação -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Captação"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
 
                     <!-- Container dos campos Captação -->
                     <LinearLayout
@@ -223,12 +214,12 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Total:"
+                                android:text="Total de Oportunidades:"
                                 android:textSize="14sp"
                                 android:textColor="#666666" />
 
                             <TextView
-                                android:id="@+id/tvTotalCaptacao"
+                                android:id="@+id/tvTotalOport"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -255,7 +246,7 @@
                                 android:textColor="#666666" />
 
                             <TextView
-                                android:id="@+id/tvCaptacaoGanhas"
+                                android:id="@+id/tvOportGanhas"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -282,7 +273,7 @@
                                 android:textColor="#666666" />
 
                             <TextView
-                                android:id="@+id/tvCaptacaoPerdidas"
+                                android:id="@+id/tvOportPerdidas"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -308,7 +299,7 @@
                                 android:textColor="#666666" />
 
                             <TextView
-                                android:id="@+id/tvCaptacaoAberto"
+                                android:id="@+id/tvOportAberto"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="0"
@@ -322,139 +313,6 @@
 
                 </LinearLayout>
 
-                <!-- Seção Acompanhamento -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <!-- Subtítulo Acompanhamento -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Acompanhamento"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="8dp" />
-
-                    <!-- Container dos campos Acompanhamento -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingStart="8dp">
-
-                        <!-- Total Acompanhamento -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Total:"
-                                android:textSize="14sp"
-                                android:textColor="#666666" />
-
-                            <TextView
-                                android:id="@+id/tvTotalAcompanhamento"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="14sp"
-                                android:textColor="#333333"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <!-- Ganhas Acompanhamento -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Ganhas:"
-                                android:textSize="14sp"
-                                android:textColor="#666666" />
-
-                            <TextView
-                                android:id="@+id/tvAcompanhamentoGanhas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="14sp"
-                                android:textColor="#4CAF50"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <!-- Perdidas Acompanhamento -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="8dp">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Perdidas:"
-                                android:textSize="14sp"
-                                android:textColor="#666666" />
-
-                            <TextView
-                                android:id="@+id/tvAcompanhamentoPerdidas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="14sp"
-                                android:textColor="#F44336"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                        <!-- Em Aberto Acompanhamento -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Em Aberto:"
-                                android:textSize="14sp"
-                                android:textColor="#666666" />
-
-                            <TextView
-                                android:id="@+id/tvAcompanhamentoAberto"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0"
-                                android:textSize="14sp"
-                                android:textColor="#2196F3"
-                                android:textStyle="bold" />
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                </LinearLayout>
 
             </LinearLayout>
 

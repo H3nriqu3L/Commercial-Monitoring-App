@@ -2,6 +2,7 @@
 package com.example.commercial_monitoring_app;
 
 import static com.example.commercial_monitoring_app.MyApp.getOportunidadeList;
+import static com.example.commercial_monitoring_app.MyApp.getUserSession;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -211,101 +212,6 @@ public class HomeFragment extends Fragment {
         loadOportunidadesAbertas();
     }
 
-    private void loadOportunidadesGanhas() {
-        if (MyApp.getCountOportunidadesGanhas()!=-1){
-            oportunidadesGanhas.setText(String.valueOf(MyApp.getCountOportunidadesGanhas()));
-            return;
-        }
-        try {
-            List<Client> clients = MyApp.getClientList();
-            int totalClients = clients.size();
-
-            if (totalClients == 0) {
-                return;
-            }
-
-            List<Oportunidade> todasOportunidades = MyApp.getTodasOportunidadesList();
-
-            final int[] ganhoCount = {0};
-            final int[] responsesReceived = {0};
-            UserSession session = UserSession.getInstance(MyApp.getAppContext());
-
-            String responsael_ID = String.valueOf(session.getUserID());
-
-
-            for (Client client : clients) {
-                int clientId = client.getId();
-
-                Call<ResponseBody> call = MyApp.getApiService().getNavegacaoInternaUsuario(clientId);
-
-                call.enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            try {
-                                String rawJson = response.body().string();
-                                Log.d("NAV_DEBUG", "Client ID " + clientId + ": " + rawJson);
-
-                                JSONObject root = new JSONObject(rawJson);
-                                JSONObject dadosPessoaWrapper = root.optJSONObject("dadosPessoa");
-
-                                if (dadosPessoaWrapper != null && dadosPessoaWrapper.optBoolean("success")) {
-                                    JSONObject dadosPessoa = dadosPessoaWrapper.optJSONObject("dados");
-                                    if (dadosPessoa != null) {
-                                        JSONArray processos = dadosPessoa.optJSONArray("processos");
-                                        if (processos != null) {
-                                            for (int i = 0; i < processos.length(); i++) {
-                                                JSONObject processo = processos.getJSONObject(i);
-                                                JSONArray oportunidades = processo.optJSONArray("oportunidades");
-
-                                                if (oportunidades != null) {
-                                                    for (int j = 0; j < oportunidades.length(); j++) {
-                                                        JSONObject oportunidade = oportunidades.getJSONObject(j);
-                                                        String status = oportunidade.optString("status");
-                                                        String responsavel = oportunidade.optString("responsavel");
-
-                                                        if ("2".equals(status) && responsael_ID.equals(responsavel)) {
-                                                            ganhoCount[0]++;
-                                                            Log.d("STATUS_MATCH", "Ganho encontrado para clientId " + clientId);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                            } catch (Exception e) {
-                                Log.e("PARSE_ERROR", "Erro ao parsear JSON para clientId " + clientId, e);
-                            }
-                        } else {
-                            Log.e("API_ERROR", "Erro HTTP para clientId " + clientId + ": código " + response.code());
-                        }
-
-                        responsesReceived[0]++;
-                        if (responsesReceived[0] == totalClients) {
-                            oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
-                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        Log.e("NAV_FAILURE", "Erro de rede para clientId " + clientId, t);
-                        responsesReceived[0]++;
-                        if (responsesReceived[0] == totalClients) {
-                            oportunidadesGanhas.setText(String.valueOf(ganhoCount[0]));
-                            MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
-                        }
-                    }
-                });
-            }
-        } catch (Exception e) {
-            Log.e("LOAD_ERROR", "Erro inesperado", e);
-            throw new RuntimeException(e);
-        }
-    }
-
     private void loadOportunidadesGanhasEPerdidas() {
         if (MyApp.getCountOportunidadesGanhas()!=-1 || MyApp.getCountOportunidadesPerdidas()!=-1){
             if (MyApp.getCountOportunidadesGanhas()!=-1) {
@@ -330,6 +236,9 @@ public class HomeFragment extends Fragment {
 
             final int[] ganhoCount = {0};
             final int [] lostCount = {0};
+            final int[] totalGanhoCount = {0};
+            final int [] totalLostCount = {0};
+
             final int[] responsesReceived = {0};
             UserSession session = UserSession.getInstance(MyApp.getAppContext());
 
@@ -366,14 +275,19 @@ public class HomeFragment extends Fragment {
                                                         JSONObject oportunidade = oportunidades.getJSONObject(j);
                                                         String status = oportunidade.optString("status");
                                                         String responsavel = oportunidade.optString("responsavel");
-
-                                                        if ("2".equals(status) && responsael_ID.equals(responsavel)) {
-                                                            ganhoCount[0]++;
-                                                            Log.d("STATUS_MATCH", "Ganho encontrado para clientId " + clientId +  " consultoraresponsavel: " + responsavel + "eu: "+ responsael_ID);
+                                                        if("2".equals(status)) {
+                                                            totalGanhoCount[0]++;
+                                                            if (responsael_ID.equals(responsavel)) {
+                                                                ganhoCount[0]++;
+                                                                Log.d("STATUS_MATCH", "Ganho encontrado para clientId " + clientId + " consultoraresponsavel: " + responsavel + "eu: " + responsael_ID);
+                                                            }
                                                         }
-                                                        if("3".equals(status)){
-                                                            lostCount[0]++;
-                                                            Log.d("STATUS_MATCH", "Lost encontrado para clientId " + clientId + " consultoraresponsavel: " + responsavel + "eu: "+ responsael_ID);
+                                                        if("3".equals(status)) {
+                                                            totalLostCount[0]++;
+                                                            if (responsael_ID.equals(responsavel)) {
+                                                                lostCount[0]++;
+                                                                Log.d("STATUS_MATCH", "Lost encontrado para clientId " + clientId + " consultoraresponsavel: " + responsavel + "eu: " + responsael_ID);
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -396,6 +310,9 @@ public class HomeFragment extends Fragment {
 
                             oportunidadesPerdidas.setText(String.valueOf(lostCount[0]));
                             MyApp.setCountOportunidadesPerdidas(lostCount[0]);
+
+                            MyApp.setCountTotalOportunidadesGanhas(totalGanhoCount[0]);
+                            MyApp.setCountTotalOportunidadesPerdidas(totalLostCount[0]);
                         }
                     }
 
@@ -408,6 +325,9 @@ public class HomeFragment extends Fragment {
                             MyApp.setCountOportunidadesGanhas(ganhoCount[0]);
                             oportunidadesPerdidas.setText(String.valueOf(lostCount[0]));
                             MyApp.setCountOportunidadesPerdidas(lostCount[0]);
+
+                            MyApp.setCountTotalOportunidadesGanhas(totalGanhoCount[0]);
+                            MyApp.setCountTotalOportunidadesPerdidas(totalLostCount[0]);
                         }
                     }
                 });
@@ -419,9 +339,39 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadOportunidadesAbertas() {
-        // Procura quantidade oportunidades abertas na API e seta valor
-        String aux = String.valueOf(MyApp.getOportunidadeList().size());
-        oportunidadesAbertas.setText(aux);
+        String TAG = "LoadOportunidades";
+
+        Log.d(TAG, "Starting loadOportunidadesAbertas method");
+
+        List<Oportunidade> oportunidadeList = MyApp.getOportunidadeList();
+        Log.i(TAG, "Retrieved opportunity list with size: " + (oportunidadeList != null ? oportunidadeList.size() : "null"));
+
+        UserSession session = UserSession.getInstance(getContext());
+        String currentUserName = session.getUserName();
+        Log.i(TAG, "Current user: " + currentUserName);
+
+        int count = 0;
+
+        if (oportunidadeList != null) {
+            for(int i = 0; i < oportunidadeList.size(); i++){
+                Oportunidade oportunidade = oportunidadeList.get(i);
+                String responsavelNome = oportunidade.getResponsavelNome();
+
+                Log.v(TAG, "Checking opportunity " + i + " - Responsible: " + responsavelNome);
+
+                if(responsavelNome != null && responsavelNome.equals(currentUserName)){
+                    count++;
+                    Log.d(TAG, "Match found! Count is now: " + count);
+                }
+            }
+        } else {
+            Log.w(TAG, "Opportunity list is null");
+        }
+
+        Log.i(TAG, "Final count of opportunities for user '" + currentUserName + "': " + count);
+        oportunidadesAbertas.setText(String.valueOf(count));
+
+        Log.d(TAG, "loadOportunidadesAbertas method completed");
     }
 
     public void refreshAtividades() {

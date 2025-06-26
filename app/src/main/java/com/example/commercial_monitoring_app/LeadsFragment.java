@@ -49,8 +49,7 @@ public class LeadsFragment extends Fragment {
     private TextView tvTarefasTotal, tvTarefasPendentes, tvTarefasVencidas;
 
     //TextView do Status Oportunidades
-    private TextView tvCaptacaoTotal, tvCaptacaoGanhas, tvCaptacaoPerdidas, tvCaptacaoEmAberto;
-    private TextView tvAcompanhamentoTotal, tvAcompanhamentoGanhas, tvAcompanhamentoPerdidas, tvAcompanhamentoEmAberto;
+    private TextView tvOportTotal, tvOportGanhas, tvOportPerdidas, tvOportEmAberto;
 
 
     private final List<String> etapasAcompanhamento = Arrays.asList("Em Alerta", "Evadidos", "Alunos Regulares");
@@ -139,15 +138,11 @@ public class LeadsFragment extends Fragment {
         tvTarefasTotal= view.findViewById(R.id.tvTotalTarefas);
 
         //TexttView Oportunidades Status
-        tvCaptacaoTotal =  view.findViewById(R.id.tvTotalCaptacao);
-        tvCaptacaoGanhas =  view.findViewById(R.id.tvCaptacaoGanhas);
-        tvCaptacaoPerdidas =  view.findViewById(R.id.tvCaptacaoPerdidas);
-        tvCaptacaoEmAberto =  view.findViewById(R.id.tvCaptacaoAberto);
+        tvOportTotal =  view.findViewById(R.id.tvTotalOport);
+        tvOportGanhas =  view.findViewById(R.id.tvOportGanhas);
+        tvOportPerdidas =  view.findViewById(R.id.tvOportPerdidas);
+        tvOportEmAberto =  view.findViewById(R.id.tvOportAberto);
 
-        tvAcompanhamentoTotal = view.findViewById(R.id.tvTotalAcompanhamento);
-        tvAcompanhamentoGanhas = view.findViewById(R.id.tvAcompanhamentoGanhas);
-        tvAcompanhamentoPerdidas = view.findViewById(R.id.tvAcompanhamentoPerdidas);
-        tvAcompanhamentoEmAberto = view.findViewById(R.id.tvAcompanhamentoAberto);
 
 
     }
@@ -172,19 +167,23 @@ public class LeadsFragment extends Fragment {
 
     private void setupOportunidades(){
         List<Oportunidade> oportunidadeList = MyApp.getOportunidadeList();
-        int capAberto = 0;
-        int acomAberto = 0;
+        int totalOportunidadesGanhas= MyApp.getCountTotalOportunidadesGanhas();
+        int totalOportunidadesPerdidas = MyApp.getCountTotalOportunidadesPerdidas();
+        int totalOportunidadesEmAberto = oportunidadeList.size();
 
-        for(int i=0; i<oportunidadeList.size(); i++){
-            Oportunidade oportunidade = oportunidadeList.get(i);
-            if(etapasAcompanhamento.contains(oportunidade.getEtapaNome())){
-                acomAberto++;
-            } else {
-                capAberto++;
-            }
+
+        tvOportEmAberto.setText(String.valueOf(totalOportunidadesEmAberto));
+
+
+        if(totalOportunidadesGanhas!=-1){
+            tvOportGanhas.setText(String.valueOf(totalOportunidadesGanhas));
         }
-        tvAcompanhamentoEmAberto.setText(String.valueOf(acomAberto));
-        tvCaptacaoEmAberto.setText(String.valueOf(capAberto));
+        if(totalOportunidadesPerdidas!=-1){
+            tvOportPerdidas.setText(String.valueOf(totalOportunidadesPerdidas));
+        }
+
+        tvOportTotal.setText(String.valueOf(totalOportunidadesGanhas+totalOportunidadesEmAberto+totalOportunidadesPerdidas));
+
     }
 
     private void setupClickListeners() {

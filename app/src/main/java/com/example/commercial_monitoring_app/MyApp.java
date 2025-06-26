@@ -74,6 +74,9 @@ public class MyApp extends Application {
     private static int countOportunidadesGanhas = -1;
     private static int countOportunidadesPerdidas = -1;
 
+    private static int countTotalOportunidadesGanhas = -1;
+    private static int countTotalOportunidadesPerdidas = -1;
+
 
     private static ApiService apiService;
 
@@ -112,6 +115,17 @@ public class MyApp extends Application {
 
     public static void setCountOportunidadesGanhas(int count) {
         countOportunidadesGanhas = count;
+    }
+    public static int getCountTotalOportunidadesGanhas(){return countTotalOportunidadesGanhas;}
+
+    public static void setCountTotalOportunidadesGanhas(int count) {
+        countTotalOportunidadesGanhas = count;
+    }
+
+    public static int getCountTotalOportunidadesPerdidas(){return countTotalOportunidadesPerdidas;}
+
+    public static void setCountTotalOportunidadesPerdidas(int count) {
+        countTotalOportunidadesPerdidas = count;
     }
 
     public static int getCountOportunidadesPerdidas(){return countOportunidadesPerdidas;}
