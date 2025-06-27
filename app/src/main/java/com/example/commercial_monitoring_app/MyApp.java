@@ -311,7 +311,7 @@ public class MyApp extends Application {
                         agendamentoList = new ArrayList<>();
                     }else{
                         agendamentoList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
-                        Log.d("API", "Agendamentos carregados: " + agendamentoList.size());
+                        Log.d("API_AGENDAMENTOS", "Agendamentos carregados: " + agendamentoList.size());
                     }
                 } else {
                     logAndShowError("Erro na API: " + response.code(), response);

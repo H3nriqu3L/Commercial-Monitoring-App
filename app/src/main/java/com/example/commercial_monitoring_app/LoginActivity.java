@@ -40,6 +40,10 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.loginButton);
 
         loginButton.setOnClickListener(view -> attemptLogin());
+        MyApp.setCountTotalOportunidadesPerdidas(-1);
+        MyApp.setCountTotalOportunidadesGanhas(-1);
+        MyApp.setCountOportunidadesGanhas(-1);
+        MyApp.setCountOportunidadesPerdidas(-1);
     }
 
     private void attemptLogin() {

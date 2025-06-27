@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -206,6 +207,12 @@ public class AtividadeDetailActivity extends AppCompatActivity {
     private void performAtividadeConclude() {
         ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
         UserSession session = MyApp.getUserSession();
+
+        if(!responsavel.equals(session.getUserName())){
+            Toast.makeText(AtividadeDetailActivity.this, "Essa tarefa não é sua; é impossível concluí-la.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         Map<String, String> payload = new HashMap<>();
         payload.put("tipoSalvar", "3");

@@ -375,8 +375,8 @@ public class HomeFragment extends Fragment {
     }
 
     public void refreshAtividades() {
-        Log.d("HomeFragment", "refreshAtividades() CHAMADO - fazendo nova requisição da API");
-
+        Log.d("API_AGENDAMENTOS", "refreshAtividades() CHAMADO - fazendo nova requisição da API");
+        //Log.d("API_AGENDAMENTOS", "Agendamentos carregados: " + agendamentoList.size());
         ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
         Callback<ResponseWrapper<Agendamento>> callback = new Callback<ResponseWrapper<Agendamento>>() {
@@ -388,6 +388,7 @@ public class HomeFragment extends Fragment {
                     getActivity().runOnUiThread(() -> {
                         // Pegar a lista atualizada que foi setada pelo fetchAgendamento
                         agendamentoList = MyApp.getAgendamentoList();
+                        agendamentoAdapter.updateData(agendamentoList);
                         Log.d("HomeFragment", "Atualizando UI com " + agendamentoList.size() + " agendamentos");
 
                         Log.d("HomeFragment", "Adapter atualizado com dados da API");

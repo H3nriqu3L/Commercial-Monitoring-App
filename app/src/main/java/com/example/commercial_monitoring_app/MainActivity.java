@@ -243,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout item5 = popupView.findViewById(R.id.menu_item5);
         item5.setOnClickListener(v -> {
             session.clearSession();
+
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
