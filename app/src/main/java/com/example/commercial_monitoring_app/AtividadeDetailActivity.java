@@ -241,7 +241,7 @@ public class AtividadeDetailActivity extends AppCompatActivity {
             payload.put("curso", curso);
         }
 
-        if(oportunidadeId == null){
+        if(oportunidadeId != null){
             payload.put("oportunidades[]", oportunidadeId);
             payload.put("oportunidade[0][id]", oportunidadeId);
         }
