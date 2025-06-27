@@ -150,7 +150,6 @@ public class AtividadeDetailActivity extends AppCompatActivity {
                         numero.substring(0, 5),
                         numero.substring(5));
             } else {
-                // Formato não reconhecido
                 return telefoneOriginal;
             }
 

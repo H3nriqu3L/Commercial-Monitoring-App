@@ -306,9 +306,13 @@ public class MyApp extends Application {
         call.enqueue(new Callback<ResponseWrapper<Agendamento>>() {
             @Override
             public void onResponse(Call<ResponseWrapper<Agendamento>> call, Response<ResponseWrapper<Agendamento>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().dados != null) {
-                    agendamentoList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
-                    Log.d("API", "Agendamentos carregados: " + agendamentoList.size());
+                if (response.isSuccessful() ) {
+                    if(response.body() == null || response.body().dados == null){
+                        agendamentoList = new ArrayList<>();
+                    }else{
+                        agendamentoList = response.body().dados.dados != null ? response.body().dados.dados : new ArrayList<>();
+                        Log.d("API", "Agendamentos carregados: " + agendamentoList.size());
+                    }
                 } else {
                     logAndShowError("Erro na API: " + response.code(), response);
                 }
