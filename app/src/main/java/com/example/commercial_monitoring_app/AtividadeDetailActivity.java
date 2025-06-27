@@ -205,6 +205,7 @@ public class AtividadeDetailActivity extends AppCompatActivity {
 
     private void performAtividadeConclude() {
         ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
+        UserSession session = MyApp.getUserSession();
 
         Map<String, String> payload = new HashMap<>();
         payload.put("tipoSalvar", "3");
@@ -226,7 +227,7 @@ public class AtividadeDetailActivity extends AppCompatActivity {
         payload.put("tipo", "3");
         payload.put("formaContato", "1");
         payload.put("tipoVinculo", "pessoa");
-        payload.put("responsavelUnico", "91");
+        payload.put("responsavelUnico", String.valueOf(session.getUserID()));
         payload.put("agendamentoUnico", "true");
         payload.put("indiceFilaRequisicao", "1");
 
@@ -240,8 +241,11 @@ public class AtividadeDetailActivity extends AppCompatActivity {
             payload.put("curso", curso);
         }
 
-        payload.put("oportunidades[]", oportunidadeId);
-        payload.put("oportunidade[0][id]", oportunidadeId);
+        if(oportunidadeId == null){
+            payload.put("oportunidades[]", oportunidadeId);
+            payload.put("oportunidade[0][id]", oportunidadeId);
+        }
+
         payload.put("oportunidade[0][curso]", curso != null ? curso : "");
         payload.put("oportunidade[0][cursoNome]", cursoNome != null ? cursoNome : "");
         payload.put("oportunidade[0][razaoOportunidade]", razaoOportunidade != null ? razaoOportunidade : "1");
