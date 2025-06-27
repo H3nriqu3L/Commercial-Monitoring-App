@@ -9,9 +9,12 @@ import com.example.commercial_monitoring_app.model.PersonalData;
 import com.example.commercial_monitoring_app.model.Responsavel;
 
 
+import java.util.Map;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
@@ -178,6 +181,18 @@ public interface ApiService {
     Call<okhttp3.ResponseBody> getNavegacaoInternaUsuario(
             @Query("id") int id
     );
+
+    @FormUrlEncoded
+    @Headers({
+            "Content-Type: application/x-www-form-urlencoded",
+            "Cookie: token=Q9VRHME2FL; PHPSESSID=l78cv2qc2u2qva1eoddh4d1004"
+    })
+    @POST("api/Agendamento/cadastro")
+    Call<okhttp3.ResponseBody> concluirAtividadeCadastro(
+            @FieldMap Map<String, String> fields
+    );
+
+
 
 
 

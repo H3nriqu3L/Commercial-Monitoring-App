@@ -9,9 +9,17 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.commercial_monitoring_app.network.ApiService;
+import com.example.commercial_monitoring_app.network.RetrofitClient;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
 
 public class AtividadeDetailActivity extends AppCompatActivity {
 
@@ -25,6 +33,13 @@ public class AtividadeDetailActivity extends AppCompatActivity {
     private TextView tvClienteEmail;
     private TextView tvDescricao;
     String atividadeId;
+    String oportunidadeId;
+    String pessoaId;
+    String curso;
+    String cursoNome;
+    String razaoOportunidade;
+    String razaoOportunidadeNome;
+
     String tipoAtividade;
     String atividade;
     String vencimento;
@@ -60,6 +75,8 @@ public class AtividadeDetailActivity extends AppCompatActivity {
         if (intent != null) {
 
             atividadeId = intent.getStringExtra("atividade_id");
+            oportunidadeId = intent.getStringExtra("oportunidade");
+            pessoaId = intent.getStringExtra("pessoa");
             tipoAtividade = intent.getStringExtra("tipo_atividade");
             atividade = intent.getStringExtra("atividade");
             vencimento = formatarData(intent.getStringExtra("vencimento"));
@@ -68,6 +85,11 @@ public class AtividadeDetailActivity extends AppCompatActivity {
             clienteNumero = formatarTelefone(intent.getStringExtra("cliente_numero"));
             clienteEmail = intent.getStringExtra("cliente_email");
             descricao = intent.getStringExtra("descricao");
+
+            curso = intent.getStringExtra("curso");;
+            cursoNome = intent.getStringExtra("cursoNome");;
+            razaoOportunidade = intent.getStringExtra("razaoOportunidade");;
+            razaoOportunidadeNome = intent.getStringExtra("razaoOportunidadeNome");;
 
 
             tvTipoAtividade.setText(tipoAtividade != null ? tipoAtividade : "-");
@@ -146,13 +168,62 @@ public class AtividadeDetailActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void performAtividadeConclude(){
-        //atividadeId é o ID da atividade/agendamento que precisa ser marcada como concluida na API
-        // TODO: MUDANCA NA API AQUI:
+    private void performAtividadeConclude() {
+        ApiService apiService = RetrofitClient.getApiService(ApiService.class, "https://crmufvgrupo3.apprubeus.com.br/");
 
+        Map<String, String> payload = new HashMap<>();
+        payload.put("tipoSalvar", "3"); // Indicates 'conclude'
+        payload.put("id", atividadeId); // ID da atividade
+        payload.put("tipoAtividadeNome", tipoAtividade);
+        payload.put("atividade", atividade);
+        payload.put("vencimento", vencimento.replace(" ", "T")); // adapt to correct datetime format if needed
+        payload.put("responsavel", responsavel);
+        payload.put("pessoaNome", clienteNome);
+        payload.put("pessoa", "15"); // hardcoded for demo; ideally comes from intent
+        payload.put("descricao", descricao != null ? descricao : "");
+        payload.put("concluido", "1"); // important flag
+        payload.put("duracao", "300"); // default to 5min duration
+        payload.put("tipo", "3"); // default tipo (adapt if dynamic)
+        payload.put("formaContato", "1");
+        payload.put("contato", atividade);
+        payload.put("hora", "08:00"); // if you want to fix a value or parse from vencimento
+        payload.put("tipoVinculo", "pessoa");
+        payload.put("responsavelUnico", "91"); // optional but matches pattern
+        payload.put("agendamentoUnico", "true");
+        payload.put("indiceFilaRequisicao", "1");
 
-        setResult(RESULT_OK); //Avisa que a atividade foi concluida para a tela Home atualizar com as mudancas
-        finish(); // volta pra tela anterior
+        payload.put("oportunidades[]", oportunidadeId);
+        payload.put("oportunidade[0][id]", oportunidadeId);
+        payload.put("oportunidade[0][curso]", "");
+        payload.put("oportunidade[0][cursoNome]", "");
+        payload.put("oportunidade[0][razaoOportunidade]", "1");
+        payload.put("oportunidade[0][razaoOportunidadeNome]", "Não contactado");
+        payload.put("pessoas[]", pessoaId);
+
+        Call<okhttp3.ResponseBody> call = apiService.concluirAtividadeCadastro(payload);
+        call.enqueue(new retrofit2.Callback<okhttp3.ResponseBody>() {
+            @Override
+            public void onResponse(Call<okhttp3.ResponseBody> call, retrofit2.Response<okhttp3.ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    showError("Erro ao concluir atividade. Código: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                showError("Erro de rede: " + t.getMessage());
+            }
+        });
     }
 
+    private void showError(String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Erro")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
+    }
 }

@@ -73,6 +73,7 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
     public void onBindViewHolder(AgendamentoAdapter.AgendamentoViewHolder holder, int position) {
         Agendamento agendamento = agendamentoList.get(position);
 
+
         holder.atividadeTitle.setText(agendamento.getContato());
         holder.atividadeCliente.setText(agendamento.getPessoaNome());
         holder.atividadeData.setText(formatarData(agendamento.getVencimento()));
@@ -95,6 +96,7 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
         }
 
         holder.itemView.setOnClickListener(v -> {
+
             Context context = v.getContext();
             Intent intent = new Intent(context, AtividadeDetailActivity.class);
             intent.putExtra("atividade", agendamento.getContato());
@@ -106,9 +108,17 @@ public class AgendamentoAdapter extends RecyclerView.Adapter<AgendamentoAdapter.
             intent.putExtra("cliente_numero", agendamento.getTelefone());
             intent.putExtra("cliente_email", agendamento.getEmail());
             intent.putExtra("atividade_id", agendamento.getId());
+            intent.putExtra("oportunidade", agendamento.getOportunidade());
+            intent.putExtra("pessoa", agendamento.getPessoa());
+
+            intent.putExtra("curso", agendamento.getCurso());
+            intent.putExtra("cursoNome", agendamento.getCursoNome());
+            intent.putExtra("razaoOportunidade", agendamento.getRazaoOportunidade());
+            intent.putExtra("razaoOportunidadeNome", agendamento.getRazaoOportunidadeNome());
 
             activityLauncher.launch(intent);
         });
+
     }
 
     @Override
