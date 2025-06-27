@@ -51,6 +51,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
     private LinearLayout nonDefaultStatusActions;
     private int oportunidadeId;
     private int currentStatus = 1;
+    String oportunidadeResponsavel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
         String clientNascimento = getIntent().getStringExtra("client_nascimento");
 
         //Oportunidade data
-        String oportunidadeResponsavel = getIntent().getStringExtra("oportunidade_responsavel");
+        oportunidadeResponsavel = getIntent().getStringExtra("oportunidade_responsavel");
         String oportunidadeCurso = getIntent().getStringExtra("oportunidade_curso");
         String oportunidadeContactado = getIntent().getStringExtra("oportunidade_contactado");
         String oportunidadeEtapa = getIntent().getStringExtra("oportunidade_etapa");
@@ -307,6 +308,14 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
     }
 
     private void performClientAssignment() {
+        if(oportunidadeResponsavel!=null) {
+            if (!oportunidadeResponsavel.isEmpty() ||
+                    !oportunidadeResponsavel.equals("null")) {
+                Toast.makeText(OportunidadeDetailActivity.this, "Essa oportunidade já tem um responsável.", Toast.LENGTH_LONG).show();
+                finish();
+                return;
+            }
+        }
         try {
             UserSession session = UserSession.getInstance(OportunidadeDetailActivity.this);
             int userIdResponsavel = session.getUserID();
@@ -421,7 +430,19 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
 
 
     private void performClientWon() {
+        UserSession session = UserSession.getInstance(OportunidadeDetailActivity.this);
+        Log.e("API_WON", "responsavel: " + oportunidadeResponsavel);
+        if(oportunidadeResponsavel == null ||
+                oportunidadeResponsavel.isEmpty() ||
+                oportunidadeResponsavel.equals("null") ||
+                !oportunidadeResponsavel.equals(session.getUserName())){
+
+            Toast.makeText(OportunidadeDetailActivity.this, "Essa oportunidade não é sua.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         try {
+            //Log.e("API_WON", "Executando try...");
             if (oportunidadeId == -1 || clientId == null) {
                 Toast.makeText(this, "Dados inválidos", Toast.LENGTH_SHORT).show();
                 return;
@@ -497,6 +518,17 @@ public class OportunidadeDetailActivity extends AppCompatActivity {
     }
 
     private void performClientLost() {
+        UserSession session = UserSession.getInstance(OportunidadeDetailActivity.this);
+        Log.e("API_LOST", "responsavel: " + oportunidadeResponsavel);
+        if(oportunidadeResponsavel == null ||
+                oportunidadeResponsavel.isEmpty() ||
+                oportunidadeResponsavel.equals("null") ||
+                !oportunidadeResponsavel.equals(session.getUserName())){
+
+            Toast.makeText(OportunidadeDetailActivity.this, "Essa oportunidade não é sua.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         try {
             if (oportunidadeId == -1 || clientId == null) {
                 Toast.makeText(this, "Dados inválidos", Toast.LENGTH_SHORT).show();
