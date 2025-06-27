@@ -3,7 +3,11 @@ package com.example.commercial_monitoring_app;
 import static java.security.AccessController.getContext;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -11,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -18,6 +23,7 @@ import com.example.commercial_monitoring_app.model.Client;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -134,6 +140,22 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    private void loadProfileImageToView(ImageView imageView) {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("UserProfile", Context.MODE_PRIVATE);
+            String encodedImage = sharedPreferences.getString("profile_image", null);
+
+            if (encodedImage != null) {
+                byte[] decodedString = Base64.decode(encodedImage, Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                imageView.setImageBitmap(decodedByte);
+            }
+            // Se não houver imagem salva, mantém a imagem padrão
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Em caso de erro, mantém a imagem padrão
+        }
+    }
 
     public void onMenuClick(View view) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -145,6 +167,11 @@ public class MainActivity extends AppCompatActivity {
 
         TextView vendedorNome = popupView.findViewById(R.id.cliente_nome);
         TextView vendedorEmail = popupView.findViewById(R.id.cliente_email);
+
+        ImageView profileImage = popupView.findViewById(R.id.profile_image);
+        if (profileImage != null) {
+            loadProfileImageToView(profileImage);
+        }
 
         // Configurar os dados do usuário
         UserSession session = UserSession.getInstance(this);
