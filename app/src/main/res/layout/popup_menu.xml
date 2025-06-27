@@ -107,7 +107,7 @@
                         android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:src="@drawable/profile"
-                        app:tint="@color/icon_tint"/>
+                        app:tint="@color/colorDetailInfo"/>
 
                 </FrameLayout>
 
@@ -144,7 +144,7 @@
                         android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:src="@drawable/home"
-                        app:tint="@color/icon_tint"/>
+                        app:tint="@color/colorDetailInfo"/>
 
                 </FrameLayout>
 
@@ -181,7 +181,7 @@
                         android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:src="@drawable/binoculars"
-                        app:tint="@color/icon_tint"/>
+                        app:tint="@color/colorDetailInfo"/>
 
                 </FrameLayout>
 
@@ -218,7 +218,7 @@
                         android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:src="@drawable/monitoring"
-                        app:tint="@color/icon_tint"/>
+                        app:tint="@color/colorDetailInfo"/>
 
                 </FrameLayout>
 
